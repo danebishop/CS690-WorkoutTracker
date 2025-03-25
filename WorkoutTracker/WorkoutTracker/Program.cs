@@ -4,6 +4,12 @@ class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
+        //initialize new COnsole
+        ConsoleUI theUI = new ConsoleUI();
+
+        //then run the ui
+        theUI.Show();
+
+
     }
 }
