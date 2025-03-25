@@ -16,13 +16,10 @@ public class FileSaver{
         File.AppendAllText(this.fileName, line + Environment.NewLine);
     }
 
-    public void AppendDataTime(WorkoutDataTime data){
-        File.AppendAllText(this.fileName, data.WorkoutName + ":" + data.workTime + ":" + data.User + ":" + data.TimeStamp + ":" + data.Groups + Environment.NewLine);
+    public void AppendWorkoutData(Workoutdata data){
+        File.AppendAllText(this.fileName, data.WorkoutName + ";" + data.WorkoutDuration + ";"+ data.User + ";" + data.TimeStamp + ";" + data.Groups + Environment.NewLine);
     }
 
-    public void AppendDataReps(WorkoutDataReps data){
-        File.AppendAllText(this.fileName, data.WorkoutName + ":" + data.workReps + ":" + data.User + ":" + data.TimeStamp + ":" + data.Groups + Environment.NewLine);
-    }
 
 }
 

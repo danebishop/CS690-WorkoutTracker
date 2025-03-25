@@ -54,39 +54,33 @@ public class Groups{
     }
 }
 
+public class Workoutdata
+{
+    public WorkoutName WorkoutName { get; }
+    public object WorkoutDuration { get; }  // Can hold either a TimeSpan (for time-based workouts) or an int (for rep-based workouts)
+    public User User { get; }
+    public DateTime TimeStamp { get; }
+    public Groups Groups { get; }
 
-
-public class WorkoutDataReps{
-    public WorkoutName WorkoutName{get;}
-    public int workReps{get;}
-    public User User {get;}
-    public DateTime TimeStamp {get;}
-    public Groups Groups{get;}
-
-    public WorkoutDataReps(WorkoutName workoutname, int workReps, User user, DateTime timeStamp, Groups groups){
-        this.WorkoutName = workoutname; 
-        this.workReps = workReps;
+    public Workoutdata(WorkoutName workoutName, object workoutDuration, User user, DateTime timeStamp, Groups groups)
+    {
+        this.WorkoutName = workoutName;
+        this.WorkoutDuration = workoutDuration;
         this.User = user;
         this.TimeStamp = timeStamp;
         this.Groups = groups;
     }
 
-}
-
-public class WorkoutDataTime{
-    public WorkoutName WorkoutName{get;}
-    public TimeSpan workTime{get;}
-    public User User {get;}
-    public DateTime TimeStamp {get;}
-    public Groups Groups{get;}
-
-    public WorkoutDataTime(WorkoutName workoutname, TimeSpan workTime, User user, DateTime timeStamp, Groups groups){
-        this.WorkoutName = workoutname; 
-        this.workTime = workTime;
-        this.User = user;
-        this.TimeStamp = timeStamp;
-        this.Groups = groups;
+    public string GetWorkoutDuration()
+    {
+        if (WorkoutDuration is TimeSpan timeSpan)
+        {
+            return $"Time spent: {timeSpan}";
+        }
+        else if (WorkoutDuration is int reps)
+        {
+            return $"Reps: {reps}";
+        }
+        return "Unknown workout duration type";
     }
-
 }
-
