@@ -11,13 +11,37 @@ public class ConsoleUI{
     }
 
     public void Show(){
-        Console.WriteLine("Select Mode: Login or Create Account");
+    
         var mode = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Please select mode").AddChoices(new[]{"Login","Create Account"}));
 
-
         if (mode == "Create Account"){
-            Console.WriteLine("Enter User Name:");
-            Console.WriteLine("Enter password:");
+            bool isUnique;
+            string newUserName, newPassword, newPassword2;
+            newPassword = "";
+            newPassword2= "_";
+            do{
+                newUserName = AnsiConsole.Prompt(new TextPrompt<string>("Enter new username(or 'exit' to quit):"));
+                isUnique = dataManager.UniqueUser(new User(newUserName));
+                if (newUserName == "exit"){
+                    continue;
+                }
+                
+            }while (isUnique == false);
+            if (newUserName != "exit"){
+                do{
+                    newPassword = AnsiConsole.Prompt(new TextPrompt<string>("Enter password:"));
+                    newPassword2 = AnsiConsole.Prompt(new TextPrompt<string>("Re-enter password:"));
+                    if (newPassword != newPassword2){
+                        Console.WriteLine("Passwords don't match, please try again");
+                    }else{
+                        continue;
+                    }
+                }while(newPassword != newPassword2);
+            }
+            if (newUserName != "exit"){
+                dataManager.AddUser(new User(newUserName), new UserPassword(newPassword));
+            }
+
         }
       
 

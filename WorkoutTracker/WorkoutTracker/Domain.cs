@@ -5,18 +5,31 @@ public class User{
     public User(string name){
         this.Name = name;
     }
+    public override bool Equals(object obj)
+    {
+        if (obj == null || GetType() != obj.GetType())
+            return false;
+        User other = (User)obj;
+        return this.Name == other.Name; 
+    }
+
+    public override int GetHashCode()
+    {
+        return Name.GetHashCode();  
+    }
+
     public override string ToString(){
         return this.Name;
     }
 }
 
 public class UserPassword{
-    public string Name{get;}
+    public string Password{get;}
     public UserPassword(string password){
-        this.Name = password;
+        this.Password = password;
     }
     public override string ToString(){
-        return this.Name;
+        return this.Password;
     }
 }
 public class WorkoutName{
