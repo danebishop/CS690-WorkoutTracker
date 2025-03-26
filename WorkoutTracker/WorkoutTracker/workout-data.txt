@@ -1,1 +1,4 @@
 Push-Ups;15;Dog;03/25/2025 21:19:25;none
+Running A Mile;9,45;Dog;03/26/2025 14:13:20;none
+Push-Ups;15;Cat;03/26/2025 14:24:54;none
+Running A Mile;8,45;Dog;03/26/2025 14:35:24;none
