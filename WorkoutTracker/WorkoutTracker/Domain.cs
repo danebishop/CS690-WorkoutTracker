@@ -57,7 +57,7 @@ public class Groups{
 public class Workoutdata
 {
     public WorkoutName WorkoutName { get; }
-    public object WorkoutDuration { get; }  // Can hold either a TimeSpan (for time-based workouts) or an int (for rep-based workouts)
+    public object WorkoutDuration { get; } 
     public User User { get; }
     public DateTime TimeStamp { get; }
     public Groups Groups { get; }
@@ -84,3 +84,27 @@ public class Workoutdata
         return "Unknown workout duration type";
     }
 }
+
+public class WorkoutManager
+    {
+        private List<Workoutdata> WorkoutStoredData;
+
+        public WorkoutManager(List<Workoutdata> workoutStoredData)
+        {
+            WorkoutStoredData = workoutStoredData;
+        }
+
+        // Method to get unique workout names
+        public List<string> GetUniqueWorkoutNames()
+        {
+            // Using a HashSet to ensure uniqueness
+            HashSet<string> uniqueWorkoutNames = new HashSet<string>();
+
+            foreach (var workout in WorkoutStoredData)
+            {
+                uniqueWorkoutNames.Add(workout.WorkoutName.Name);  // Add the workout name to the HashSet
+            }
+
+            return uniqueWorkoutNames.ToList();
+        }
+    }

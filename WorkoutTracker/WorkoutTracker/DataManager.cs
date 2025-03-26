@@ -110,5 +110,13 @@ public class DataManager{
         UserDictionary.Add(user, userPassword);
         SynchronizeUsers();
     }
+    public List<Workoutdata> GetWorkoutsByName(string workoutName)
+    {
+        var filteredWorkouts = WorkoutStoredData.Where(workout => workout.WorkoutName.Name == workoutName).ToList();
+        return filteredWorkouts;
+    }
+
+
+    
 
 }
