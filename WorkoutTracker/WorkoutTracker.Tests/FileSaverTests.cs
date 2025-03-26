@@ -25,25 +25,17 @@ public class FileSaverTests
     }
 
     [Fact]
-    public void Test_FileSaver_AppendTimeData()
+    public void Test_FileSaver_AppendWorkoutData()
     {
-        //WorkoutName sampleWorkout = new WorkoutName("sampleWorkout");
-        //User sampleUser = new User("sampleUser");
-
-
+        WorkoutName sampleWorkoutName = new WorkoutName("sampleWorkout");
+        User sampleUser = new User("sampleUser");
+        var sampleDuration = 10;
+        DateTime sampleTimeStamp = DateTime.Now;
+        var workoutGroup = "sampleGroup";
+        Groups sampleGroup = new Groups(workoutGroup);
+        Workoutdata sampleData = new Workoutdata(sampleWorkoutName, sampleDuration, sampleUser, sampleTimeStamp, sampleGroup);
+        fileSaver.AppendWorkoutData(sampleData);
+        var contentFromFile = File.ReadAllText(testFileName);
+        Assert.Equal("sampleWorkout;10;sampleUser;"+sampleTimeStamp+";sampleGroup"+Environment.NewLine, contentFromFile);
     }
-}/*
-    public WorkoutName WorkoutName{get;}
-    public int workReps{get;}
-    public User User {get;}
-    public DateTime TimeStamp {get;}
-    public Groups Groups{get;}
-
-    public WorkoutDataReps(WorkoutName workoutname, int workReps, User user, DateTime timeStamp, Groups groups){
-        this.WorkoutName = workoutname; 
-        this.workReps = workReps;
-        this.User = user;
-        this.TimeStamp = timeStamp;
-        this.Groups = groups;
-    }
-*/
+}
