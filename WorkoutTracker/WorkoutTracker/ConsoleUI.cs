@@ -94,12 +94,33 @@ public class ConsoleUI{
                                         dataManager.AddNewWorkoutData(data);
                                     }else{
                                         Console.WriteLine("You selected "+ workoutType);
-
+                                        WorkoutName workoutName = new WorkoutName(workoutType);
+                                        var workoutDuration = AnsiConsole.Prompt(new TextPrompt<string>("Enter repetitions or time (min,sec):"));
+                                        var workoutGroup = "none";
+                                        Groups group = new Groups(workoutGroup);
+                                        DateTime timestamp = DateTime.Now;
+                                        Workoutdata data = new Workoutdata(workoutName, workoutDuration, currentUser, timestamp, group);
+                                        dataManager.AddNewWorkoutData(data);
 
                                     }
 
                                 }else if(selectionMode == "Workout Reports"){
                                     Console.WriteLine("WorkoutReporting");
+                                    var reportType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Choose [green]one[/] please:").AddChoices(new[]{"Report Workout Data","Analyze Workout","Examine Group Data","Exit"}));
+                                    if (reportType == "Report Workout Data"){
+                                        Console.WriteLine("Report Workout Data CHOSEN");
+
+                                    }else if(reportType == "Analyze Workout"){
+                                        Console.WriteLine("Analyze Workout CHOSEN");
+
+                                    }else if(reportType == "Examine Group Data"){
+                                        Console.WriteLine("Examine Group Data CHOSEN");
+
+                                    }else{
+                                        Console.WriteLine("Exit CHOSEN");
+                                        continue;
+                                    }
+
 
                                 }else{
                                     Console.WriteLine("Logging out...");
