@@ -106,14 +106,70 @@ public class ConsoleUI{
 
                                 }else if(selectionMode == "Workout Reports"){
                                     Console.WriteLine("WorkoutReporting");
-                                    var reportType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Choose [green]one[/] please:").AddChoices(new[]{"Report Workout Data","Analyze Workout","Examine Group Data","Exit"}));
-                                    if (reportType == "Report Workout Data"){
-                                        Console.WriteLine("Report Workout Data CHOSEN");
+                                    var reportType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Choose [green]one[/] please:").AddChoices(new[]{"Report Data","Analyze Reports","Group Data","Exit"}));
+                                    if (reportType == "Report Data"){
+                                        Console.WriteLine("Report Data CHOSEN");
+                                        var reportDataType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Choose [green]one[/] please:").AddChoices(new[]{"Report All Data","Report Your Data Only","Exit"}));
+                                        if (reportDataType == "Report All Data"){
+                                            Console.WriteLine("Report All Data CHOSEN");
+                                            WorkoutManager workoutManager = new WorkoutManager(dataManager.WorkoutStoredData);
+                                            List<string> uniqueWorkoutNames = workoutManager.GetUniqueWorkoutNames();
+                                            string workoutTypeReport = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(uniqueWorkoutNames.Concat(new[] { "New Workout" }).ToArray()));
+                                            Console.WriteLine(workoutTypeReport+"CHOSEN");
+                                            
+                                            List<Workoutdata> chosenWorkout = dataManager.GetWorkoutsByName(workoutTypeReport);
 
-                                    }else if(reportType == "Analyze Workout"){
-                                        Console.WriteLine("Analyze Workout CHOSEN");
+                                            var table = new Table();
+                                            // Add some columns&Label them
+                                            table.AddColumn(new TableColumn(workoutTypeReport).Centered());
+                                            table.AddColumn(new TableColumn("Reps/Duration").Centered());
+                                            table.AddColumn(new TableColumn("Timestamp").Centered());
+                                            // Add some rows
+                                            foreach (var workout in chosenWorkout)
+                                            {
+                                                table.AddRow($"Workout Name: {workout.WorkoutName.Name}, Duration: {workout.GetWorkoutDuration()}, Date: {workout.TimeStamp}");
+                                            }
+                                
+                                            // Render the table to the console
+                                            AnsiConsole.Write(table);
+                                            
 
-                                    }else if(reportType == "Examine Group Data"){
+
+                                        }else if (reportDataType =="Report Your Data Only"){
+                                            Console.WriteLine("Report Your Data Only CHOSEN");
+                                            WorkoutManager workoutManager = new WorkoutManager(dataManager.WorkoutStoredData);
+                                            List<string> uniqueWorkoutNames = workoutManager.GetUniqueWorkoutNames();
+                                            string workoutTypeReport = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(uniqueWorkoutNames.Concat(new[] { "New Workout" }).ToArray()));
+                                            Console.WriteLine(workoutTypeReport+"CHOSEN");
+
+                                        }else{
+                                            Console.WriteLine("Exit CHOSEN");
+                                            continue;
+                                        }
+
+                                    }else if(reportType == "Analyze Reports"){
+                                        Console.WriteLine("Analyze Reports CHOSEN");
+                                        var analyzeDataType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Choose [green]one[/] please:").AddChoices(new[]{"Analyze All Data","Analyze Your Data Only","Exit"}));
+                                        if (analyzeDataType == "Analyze All Data"){
+                                            Console.WriteLine("Analyze All Data CHOSEN");                            
+                                            WorkoutManager workoutManager = new WorkoutManager(dataManager.WorkoutStoredData);
+                                            List<string> uniqueWorkoutNames = workoutManager.GetUniqueWorkoutNames();
+                                            var workoutTypeAnalyze = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(uniqueWorkoutNames.Concat(new[] { "New Workout" }).ToArray()));
+                                            Console.WriteLine(workoutTypeAnalyze+"CHOSEN");
+
+                                        }else if (analyzeDataType =="Analyze Your Data Only"){
+                                            Console.WriteLine("Analyze Your Data Only CHOSEN");                                            
+                                            WorkoutManager workoutManager = new WorkoutManager(dataManager.WorkoutStoredData);
+                                            List<string> uniqueWorkoutNames = workoutManager.GetUniqueWorkoutNames();
+                                            var workoutTypeAnalyze = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(uniqueWorkoutNames.Concat(new[] { "New Workout" }).ToArray()));
+                                            Console.WriteLine(workoutTypeAnalyze+"CHOSEN");
+
+                                        }else{
+                                            Console.WriteLine("Exit CHOSEN");
+                                            continue;
+                                        }
+
+                                    }else if(reportType == "Group Data"){
                                         Console.WriteLine("Examine Group Data CHOSEN");
 
                                     }else{
