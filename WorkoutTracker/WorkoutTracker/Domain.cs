@@ -42,27 +42,34 @@ public class WorkoutName{
     }
 }
 
-public class Groups{
-    public string Name {get;}
-    public List<User> Users {get;}
-    public Groups(string name){
-        this.Name = name;
-        this.Users = new List<User>();
+
+public class Groups
+{
+    public string Name { get; }
+    public List<User> Users { get; }
+
+    public Groups(string name)
+    {
+        Name = name;
+        Users = new List<User>();
     }
-    public override string ToString(){
+
+    public override string ToString()
+    {
         return this.Name;
     }
 }
 
+
 public class Workoutdata
 {
     public WorkoutName WorkoutName { get; }
-    public object WorkoutDuration { get; } 
+    public float WorkoutDuration{ get; } 
     public User User { get; }
     public DateTime TimeStamp { get; }
     public Groups Groups { get; }
 
-    public Workoutdata(WorkoutName workoutName, object workoutDuration, User user, DateTime timeStamp, Groups groups)
+    public Workoutdata(WorkoutName workoutName, float workoutDuration, User user, DateTime timeStamp, Groups groups)
     {
         this.WorkoutName = workoutName;
         this.WorkoutDuration = workoutDuration;
@@ -71,18 +78,7 @@ public class Workoutdata
         this.Groups = groups;
     }
 
-    public string GetWorkoutDuration()
-    {
-        if (WorkoutDuration is TimeSpan timeSpan)
-        {
-            return $"Time spent: {timeSpan}";
-        }
-        else if (WorkoutDuration is int reps)
-        {
-            return $"Reps: {reps}";
-        }
-        return "Unknown workout duration type";
-    }
+
 }
 
 public class WorkoutManager

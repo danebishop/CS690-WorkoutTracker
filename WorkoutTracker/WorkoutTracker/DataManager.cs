@@ -7,7 +7,7 @@ public class DataManager{
     FileSaver fileSaver;
     public Dictionary <User, UserPassword> UserDictionary {get;}
     public List<Workoutdata> WorkoutStoredData {get;}
-    public List<Groups> Group {get;}
+    public List<Groups> Groups {get;}
   
  
 
@@ -31,48 +31,77 @@ public class DataManager{
             }
         }
 
+        fileSaver = new FileSaver("groups.txt");
+        List<Groups> Groups = new List<Groups>();
+        var groupFileContent = File.ReadAllLines("workout-data.txt");
+        if (groupFileContent.Length < 1)
+        {
+            Console.WriteLine("No current groups.");
+        }else{
+              // Process each line in the file
+            foreach (var line in groupFileContent)
+            {
+                var splitted = line.Split(";", StringSplitOptions.RemoveEmptyEntries);
+
+                var groupName = splitted[0];
+
+                var group = new Groups(groupName);
+
+                for (int i = 1; i < splitted.Length; i++)
+                {
+                    var userName = splitted[i];
+                    var user = new User(userName); 
+                    group.Users.Add(user); 
+                }
+
+                // Add the group to the GroupList
+                Groups.Add(group);
+            }
+
+            Console.WriteLine("Groups have been loaded successfully.");
+        }
+
+        
+
+
         fileSaver = new FileSaver("workout-data.txt");
         WorkoutStoredData = new List<Workoutdata>();
         var workoutFileContent = File.ReadAllLines("workout-data.txt");
-        foreach (var line in workoutFileContent){
-            var splitted = line.Split(";", StringSplitOptions.RemoveEmptyEntries);
+        if (workoutFileContent.Length < 1)
+        {
+            Console.WriteLine("No workout data found in the file.");
+        }
+        else{
+            foreach (var line in workoutFileContent){
+                var splitted = line.Split(";", StringSplitOptions.RemoveEmptyEntries);
 
-            var workoutName = splitted[0];
-            var workout = new WorkoutName(workoutName);
+                var workoutName = splitted[0];
+                var workout = new WorkoutName(workoutName);
 
-            // Workout Duration (TimeSpan or int)
-            var workoutTime = splitted[1];
+                // Workout Duration (TimeSpan or int)
+                var workoutDuration = float.Parse(splitted[1]);
 
-            // Check if the workout duration is time-based or rep-based
-            object workoutDuration = null;
-            if (TimeSpan.TryParse(workoutTime, out var duration))
-            {
-                workoutDuration = duration;
+                
+                // User
+                var userName = splitted[2];
+                var user = new User(userName);
+
+                // DateTime
+                DateTime dateTime;
+                if (!DateTime.TryParse(splitted[3], out dateTime))
+                {
+                    // Handle incorrect date format
+                    Console.WriteLine($"Invalid date format: {splitted[3]}");
+                    continue; // Skip this line
+                }
+
+                // Groups
+                var group = splitted[4];
+                var groups = new Groups(group);
+
+                // Adding Workout data
+                WorkoutStoredData.Add(new Workoutdata(workout, workoutDuration, user, dateTime, groups));
             }
-            else if (int.TryParse(workoutTime, out var reps))
-            {
-                workoutDuration = reps;
-            }
-
-            // User
-            var userName = splitted[2];
-            var user = new User(userName);
-
-            // DateTime
-            DateTime dateTime;
-            if (!DateTime.TryParse(splitted[3], out dateTime))
-            {
-                // Handle incorrect date format
-                Console.WriteLine($"Invalid date format: {splitted[3]}");
-                continue; // Skip this line
-            }
-
-            // Groups
-            var group = splitted[4];
-            var groups = new Groups(group);
-
-            // Adding Workout data
-            WorkoutStoredData.Add(new Workoutdata(workout, workoutDuration, user, dateTime, groups));
         }
 
     
@@ -114,6 +143,43 @@ public class DataManager{
     {
         var filteredWorkouts = WorkoutStoredData.Where(workout => workout.WorkoutName.Name == workoutName).ToList();
         return filteredWorkouts;
+    }
+    public void SaveGroups()
+    {
+        List<string> lines = new List<string>();
+
+        foreach (var group in Groups)
+        {
+            var line = group.Name + ";" + string.Join(";", group.Users.Select(u => u.Name));
+            lines.Add(line);
+        }
+
+        File.WriteAllLines("groups.txt", lines);
+        Console.WriteLine("Groups saved successfully.");
+    }
+
+    public void AddUserToGroup(string groupName, string userName)
+    {
+        var group = Groups.FirstOrDefault(g => g.Name == groupName);
+        if (group != null)
+        {
+            group.Users.Add(new User(userName));
+            SaveGroups();  // Save changes to file
+            Console.WriteLine($"User {userName} added to group {groupName}.");
+        }
+        else
+        {
+            Console.WriteLine($"Group {groupName} not found.");
+        }
+    }
+
+    public void CreateGroup(string groupName, string userName)
+    {
+        var newGroup = new Groups(groupName);
+        newGroup.Users.Add(new User(userName));
+        Groups.Add(newGroup);
+        SaveGroups();  // Save changes to file
+        Console.WriteLine($"New group {groupName} created and {userName} added.");
     }
 
 
