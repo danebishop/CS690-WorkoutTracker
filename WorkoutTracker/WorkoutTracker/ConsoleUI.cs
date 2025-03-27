@@ -91,6 +91,7 @@ public class ConsoleUI
                             //This is where all the other functionality goes
                             //
                             bool continueNextSteps = true;
+
                             while(continueNextSteps)
                             {
                                 var selectionMode = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Please select mode").AddChoices(new[]{"Workout Tracking","Workout Reports","Join Group","Logout"}));
@@ -145,6 +146,11 @@ public class ConsoleUI
 
                                 else if (selectionMode == "Workout Tracking")
                                 {
+
+                            while(continueNextSteps){
+                                var selectionMode = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Please select mode").AddChoices(new[]{"Workout Tracking","Workout Reports","Join Group","Logout"}));
+                                if (selectionMode == "Workout Tracking"){
+
                                     // Get unique workout names using a HashSet
                                     HashSet<string> uniqueWorkoutNames = new HashSet<string>();
                                     foreach (var workout in dataManager.WorkoutStoredData)
@@ -268,10 +274,9 @@ public class ConsoleUI
                                         Console.WriteLine("Exit CHOSEN");
                                         continue;
                                     }
-                                }
-                                
-                                else
-                                {
+
+                                }else{
+
                                     Console.WriteLine("Logging out...");
                                     continueNextSteps = false;
                                 }
