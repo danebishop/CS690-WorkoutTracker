@@ -32,8 +32,8 @@ public class DataManager{
         }
 
         fileSaver = new FileSaver("groups.txt");
-        List<Groups> Groups = new List<Groups>();
-        var groupFileContent = File.ReadAllLines("workout-data.txt");
+        Groups = new List<Groups>();
+        var groupFileContent = File.ReadAllLines("groups.txt");
         if (groupFileContent.Length < 1)
         {
             Console.WriteLine("No current groups.");
@@ -71,8 +71,10 @@ public class DataManager{
         {
             Console.WriteLine("No workout data found in the file.");
         }
-        else{
-            foreach (var line in workoutFileContent){
+        else
+        {
+            foreach (var line in workoutFileContent)
+            {
                 var splitted = line.Split(";", StringSplitOptions.RemoveEmptyEntries);
 
                 var workoutName = splitted[0];
@@ -110,32 +112,39 @@ public class DataManager{
 
 
 
-    public void AddNewWorkoutData(Workoutdata data){
+    public void AddNewWorkoutData(Workoutdata data)
+    {
         this.WorkoutStoredData.Add(data);
         this.fileSaver.AppendWorkoutData(data);
-
     }
 
 
-    public bool UniqueUser(User user){
-        if (UserDictionary.ContainsKey(user)){
+    public bool UniqueUser(User user)
+    {
+        if (UserDictionary.ContainsKey(user))
+        {
             Console.WriteLine("That username is already in use, please try another.");
             return false;
-        }else{
+        }
+        else
+        {
             return true;
         }
     }
 
-    public void SynchronizeUsers(){
+    public void SynchronizeUsers()
+    {
         File.Delete("users.txt");
         List <string> usersToSave = new List<string>();
-        foreach (var user in UserDictionary){
+        foreach (var user in UserDictionary)
+        {
             usersToSave.Add($"{user.Key}:{user.Value}");
         }
         File.WriteAllLines("users.txt", usersToSave);
     }
 
-    public void AddUser(User user, UserPassword userPassword){
+    public void AddUser(User user, UserPassword userPassword)
+    {
         UserDictionary.Add(user, userPassword);
         SynchronizeUsers();
     }
@@ -144,6 +153,7 @@ public class DataManager{
         var filteredWorkouts = WorkoutStoredData.Where(workout => workout.WorkoutName.Name == workoutName).ToList();
         return filteredWorkouts;
     }
+
     public void SaveGroups()
     {
         List<string> lines = new List<string>();
@@ -158,14 +168,25 @@ public class DataManager{
         Console.WriteLine("Groups saved successfully.");
     }
 
+
     public void AddUserToGroup(string groupName, string userName)
     {
         var group = Groups.FirstOrDefault(g => g.Name == groupName);
+        
         if (group != null)
         {
-            group.Users.Add(new User(userName));
-            SaveGroups();  // Save changes to file
-            Console.WriteLine($"User {userName} added to group {groupName}.");
+            // Check if the user is already in the group
+            if (group.Users.Any(u => u.Name == userName))
+            {
+                Console.WriteLine($"User {userName} is already in the group {groupName}.");
+            }
+            else
+            {
+                // Add the user to the group
+                group.Users.Add(new User(userName));
+                SaveGroups();  // Save changes to file
+                Console.WriteLine($"User {userName} added to group {groupName}.");
+            }
         }
         else
         {
@@ -180,9 +201,6 @@ public class DataManager{
         Groups.Add(newGroup);
         SaveGroups();  // Save changes to file
         Console.WriteLine($"New group {groupName} created and {userName} added.");
-    }
-
-
-    
+    }   
 
 }
