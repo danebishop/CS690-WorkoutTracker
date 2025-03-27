@@ -147,10 +147,6 @@ public class ConsoleUI
                                 else if (selectionMode == "Workout Tracking")
                                 {
 
-                            while(continueNextSteps){
-                                var selectionMode = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Please select mode").AddChoices(new[]{"Workout Tracking","Workout Reports","Join Group","Logout"}));
-                                if (selectionMode == "Workout Tracking"){
-
                                     // Get unique workout names using a HashSet
                                     HashSet<string> uniqueWorkoutNames = new HashSet<string>();
                                     foreach (var workout in dataManager.WorkoutStoredData)
@@ -221,6 +217,7 @@ public class ConsoleUI
                                             AnsiConsole.Write(table);  
 
                                         }
+
                                         else if (reportDataType =="Report Your Data Only")
                                         {
                                             Console.WriteLine("Report Your Data Only CHOSEN");
@@ -235,7 +232,9 @@ public class ConsoleUI
                                             continue;
                                         }
 
-                                    }else if(reportType == "Analyze Reports")
+                                    }
+                                    
+                                    else if(reportType == "Analyze Reports")
                                     {
                                         Console.WriteLine("Analyze Reports CHOSEN");
                                         var analyzeDataType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Choose [green]one[/] please:").AddChoices(new[]{"Analyze All Data","Analyze Your Data Only","Exit"}));
@@ -284,7 +283,7 @@ public class ConsoleUI
                             }
                             break;//Break out of password loop since login was successful
 
-                        }
+                        } 
                         
                         else
                         {
@@ -306,5 +305,7 @@ public class ConsoleUI
     
         }   
     }
+    
+
 }
     
