@@ -85,7 +85,7 @@ public class ConsoleUI{
                                     
                                     if (workoutType == "New Workout"){
                                         var newWorkoutName = AnsiConsole.Prompt(new TextPrompt<string>("Enter new workout name:"));
-                                        var workoutDuration = AnsiConsole.Prompt(new TextPrompt<string>("Enter repetitions or time (min,sec):"));
+                                        var workoutDuration = float.Parse(AnsiConsole.Prompt(new TextPrompt<string>("Enter repetitions or time (min,sec):")));
                                         var workoutGroup = "none";
                                         WorkoutName workoutName = new WorkoutName(newWorkoutName);
                                         Groups group = new Groups(workoutGroup);
@@ -95,7 +95,7 @@ public class ConsoleUI{
                                     }else{
                                         Console.WriteLine("You selected "+ workoutType);
                                         WorkoutName workoutName = new WorkoutName(workoutType);
-                                        var workoutDuration = AnsiConsole.Prompt(new TextPrompt<string>("Enter repetitions or time (min,sec):"));
+                                        var workoutDuration = float.Parse(AnsiConsole.Prompt(new TextPrompt<string>("Enter repetitions or time (min,sec):")));
                                         var workoutGroup = "none";
                                         Groups group = new Groups(workoutGroup);
                                         DateTime timestamp = DateTime.Now;
@@ -127,7 +127,7 @@ public class ConsoleUI{
                                             // Add some rows
                                             foreach (var workout in chosenWorkout)
                                             {
-                                                table.AddRow($"Workout Name: {workout.WorkoutName.Name}, Duration: {workout.GetWorkoutDuration()}, Date: {workout.TimeStamp}");
+                                                table.AddRow($"Workout Name: {workout.WorkoutName.Name}, Duration: {workout.WorkoutDuration}, Date: {workout.TimeStamp}");
                                             }
                                 
                                             // Render the table to the console
