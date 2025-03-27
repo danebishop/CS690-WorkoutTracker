@@ -1,1 +1,6 @@
-
+Doberman:mac
+Shepherd:max
+Boxer:nissa
+Persian:kitty
+Ragdoll:cat
+Manx:bob
