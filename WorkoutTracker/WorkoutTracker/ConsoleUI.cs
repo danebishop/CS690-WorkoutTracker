@@ -15,9 +15,12 @@ public class ConsoleUI
 
     public void Show()
     {
+         AnsiConsole.Write(new FigletText("Workout Tracker").Color(Color.Cyan1));
         var mode = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Please select mode").AddChoices(new[]{"Login","Create Account"}));
         if (mode == "Create Account")
         {
+            AnsiConsole.Write(new Markup("You selected to [green]Create an Account[/]\n"));
+
             bool isUnique;
             string newUserName, newPassword, newPassword2;
             newPassword = "";
@@ -97,6 +100,8 @@ public class ConsoleUI
                                 var selectionMode = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Please select mode").AddChoices(new[]{"Workout Tracking","Workout Reports","Join Group","Logout"}));
                                 if (selectionMode == "Join Group")
                                 {
+                                    AnsiConsole.Write(new Markup("You selected to [green]Join a Group[/]\n"));
+
                                     // Get unique group names using a HashSet
                                     HashSet<string> uniqueGroupNames = new HashSet<string>();
                                     foreach (var group in dataManager.Groups)
@@ -146,6 +151,10 @@ public class ConsoleUI
 
                                 else if (selectionMode == "Workout Tracking")
                                 {
+                                    AnsiConsole.Write(new Markup("You selected [green]Workout Tracking[/]\n"));
+
+                                    
+
 
                                     // Get unique workout names using a HashSet
                                     HashSet<string> uniqueWorkoutNames = new HashSet<string>();
@@ -171,7 +180,7 @@ public class ConsoleUI
 
                                     else
                                     {
-                                        Console.WriteLine("You selected "+ workoutType);
+                                        AnsiConsole.Write(new Markup($"You selected [green]{workoutType}[/]\n"));
                                         WorkoutName workoutName = new WorkoutName(workoutType);
                                         var workoutDuration = float.Parse(AnsiConsole.Prompt(new TextPrompt<string>("Enter repetitions or time (min,sec):")));
                                         var workoutGroup = "none";
@@ -184,37 +193,40 @@ public class ConsoleUI
 
                                 else if(selectionMode == "Workout Reports")
                                 {
-                                    Console.WriteLine("WorkoutReporting");
+                                    AnsiConsole.Write(new Markup("You selected [green]Workout Reporting[/]\n"));
+                                    
+                                    
                                     var reportType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Choose [green]one[/] please:").AddChoices(new[]{"Report Data","Analyze Reports","Group Data","Exit"}));
                                     
+                                    AnsiConsole.Write(new Markup($"You selected [green]{reportType}[/]\n"));
                                     if (reportType == "Report Data")
                                     {
-                                        Console.WriteLine("Report Data CHOSEN");
                                         var reportDataType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Choose [green]one[/] please:").AddChoices(new[]{"Report All Data","Report Your Data Only","Exit"}));
-                                        
+                                        AnsiConsole.Write(new Markup($"You selected [green]{reportDataType}[/]\n"));
+
                                         if (reportDataType == "Report All Data")
                                         {
-                                            Console.WriteLine("Report All Data CHOSEN");
                                             WorkoutManager workoutManager = new WorkoutManager(dataManager.WorkoutStoredData);
                                             List<string> uniqueWorkoutNames = workoutManager.GetUniqueWorkoutNames();
                                             string workoutTypeReport = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(uniqueWorkoutNames.Concat(new[] { "New Workout" }).ToArray()));
-                                            Console.WriteLine(workoutTypeReport+"CHOSEN");
+                                            Console.WriteLine(workoutTypeReport+" Selected");
                                             
                                             List<Workoutdata> chosenWorkout = dataManager.GetWorkoutsByName(workoutTypeReport);
 
-                                            var table = new Table();
+                                            var reportTable = new Spectre.Console.Table();
                                             // Add some columns&Label them
-                                            table.AddColumn(new TableColumn(workoutTypeReport).Centered());
-                                            table.AddColumn(new TableColumn("Reps/Duration").Centered());
-                                            table.AddColumn(new TableColumn("Timestamp").Centered());
+                                            reportTable.AddColumn("Workout").Centered();
+                                            reportTable.AddColumn("Reps/Duration").Centered();
+                                            reportTable.AddColumn("Timestamp").Centered();
+                                        
                                             // Add some rows
                                             foreach (var workout in chosenWorkout)
                                             {
-                                                table.AddRow($"Workout Name: {workout.WorkoutName.Name}, Duration: {workout.WorkoutDuration}, Date: {workout.TimeStamp}");
+                                                reportTable.AddRow(workout.WorkoutName.ToString(), workout.WorkoutDuration.ToString(), workout.TimeStamp.ToString());
                                             }
 
                                             // Render the table to the console
-                                            AnsiConsole.Write(table);  
+                                            AnsiConsole.Write(reportTable);  
 
                                         }
 
@@ -225,6 +237,7 @@ public class ConsoleUI
                                             List<string> uniqueWorkoutNames = workoutManager.GetUniqueWorkoutNames();
                                             string workoutTypeReport = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(uniqueWorkoutNames.Concat(new[] { "New Workout" }).ToArray()));
                                             Console.WriteLine(workoutTypeReport+"CHOSEN");
+                                            Console.WriteLine("Report personal data not functional at this time");
                                         }
                                         else
                                         {
@@ -246,6 +259,9 @@ public class ConsoleUI
                                             List<string> uniqueWorkoutNames = workoutManager.GetUniqueWorkoutNames();
                                             var workoutTypeAnalyze = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(uniqueWorkoutNames.Concat(new[] { "New Workout" }).ToArray()));
                                             Console.WriteLine(workoutTypeAnalyze+"CHOSEN");
+                                            Console.WriteLine("Analyze All data not functional at this time");
+                                            continue;
+
                                         }
 
                                         else if (analyzeDataType =="Analyze Your Data Only")
@@ -255,6 +271,9 @@ public class ConsoleUI
                                             List<string> uniqueWorkoutNames = workoutManager.GetUniqueWorkoutNames();
                                             var workoutTypeAnalyze = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(uniqueWorkoutNames.Concat(new[] { "New Workout" }).ToArray()));
                                             Console.WriteLine(workoutTypeAnalyze+"CHOSEN");
+                                            Console.WriteLine("Analyze personal data not functional at this time");
+                                            continue; 
+
                                         }
 
                                         else
@@ -265,8 +284,9 @@ public class ConsoleUI
 
                                     }else if(reportType == "Group Data")
                                     {
-                                        Console.WriteLine("Examine Group Data CHOSEN");
-                                    }
+                                        Console.WriteLine("Examine Group Data not functional at this time");
+                                        continue;
+                                                                            }
                                     
                                     else
                                     {
