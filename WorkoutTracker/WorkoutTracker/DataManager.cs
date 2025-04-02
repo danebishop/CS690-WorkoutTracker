@@ -41,7 +41,16 @@ public class DataManager{
               // Process each line in the file
             foreach (var line in groupFileContent)
             {
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    continue; // Skip this iteration if the line is empty or contains only whitespace
+                }
+
                 var splitted = line.Split(";", StringSplitOptions.RemoveEmptyEntries);
+                if (splitted.Length < 1)
+                {
+                    continue; // Skip lines that don't have a group name
+                }
 
                 var groupName = splitted[0];
 
