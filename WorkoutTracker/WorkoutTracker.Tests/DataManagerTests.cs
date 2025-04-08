@@ -14,11 +14,11 @@ public class DataManagerTests
         dataManager = new DataManager(); 
         
         WorkoutName sampleWorkoutName = new WorkoutName("sampleWorkoutName");
-        Groups sampleGroup = new Groups("sampleGroup");
+        
         User sampleUser = new User("sampleUser");
         DateTime timestamp = DateTime.Now;
         int workoutDuration=10;
-        Workoutdata sampleData = new Workoutdata(sampleWorkoutName, workoutDuration, sampleUser, timestamp, sampleGroup);
+        Workoutdata sampleData = new Workoutdata(sampleWorkoutName, workoutDuration, sampleUser, timestamp);
         dataManager.AddNewWorkoutData(sampleData);
     }
 
@@ -43,11 +43,11 @@ public class DataManagerTests
     public void Test_Add_New_Workout_Data(){
         Assert.Equal(1, dataManager.WorkoutStoredData.Count);
         WorkoutName sampleWorkoutName = new WorkoutName("sampleWorkoutName");
-        Groups sampleGroup = new Groups("sampleGroup");
+       
         User sampleUser = new User("sampleUser");
         DateTime timestamp = DateTime.Now;
         int workoutDuration=10;
-        Workoutdata sampleData = new Workoutdata(sampleWorkoutName, workoutDuration, sampleUser, timestamp, sampleGroup);
+        Workoutdata sampleData = new Workoutdata(sampleWorkoutName, workoutDuration, sampleUser, timestamp);
         dataManager.AddNewWorkoutData(sampleData);
         Assert.Equal(2, dataManager.WorkoutStoredData.Count);
 
