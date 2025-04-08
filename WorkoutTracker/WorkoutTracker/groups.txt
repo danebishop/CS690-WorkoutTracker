@@ -1,1 +1,1 @@
-Cats;Manx
+Cats;Manx;Ragdoll;Persian

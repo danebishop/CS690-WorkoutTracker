@@ -1,2 +1,14 @@
-Climbing Trees;5;Manx;03/27/2025 16:44:42;none
-Climbing Trees;15;Doberman;04/02/2025 15:10:14;none
+Climbing Trees;5;Manx;03/27/2025 16:44:42
+Climbing Trees;15;Doberman;04/02/2025 15:10:14
+Running a Mile;8.25;Doberman;04/02/2025 16:41:48
+Running a Mile;9.15;Doberman;04/02/2025 16:43:24
+Running a Mile;7.25;Manx;04/02/2025 16:47:04
+Push Ups;20;Doberman;04/08/2025 15:44:43
+Running a Mile;8.15;Doberman;04/08/2025 15:51:23
+Running a Mile;8.25;Doberman;04/08/2025 16:07:57
+Running a Mile;8.15;Doberman;04/08/2025 16:08:05
+Running a Mile;7.55;Doberman;04/08/2025 16:08:12
+Climbing Trees;8;Ragdoll;04/08/2025 16:22:32
+Climbing Trees;9;Ragdoll;04/08/2025 16:22:36
+Climbing Trees;4;Persian;04/08/2025 16:22:53
+Climbing Trees;3;Persian;04/08/2025 16:22:55

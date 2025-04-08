@@ -32,6 +32,9 @@ public class UserPassword{
         return this.Password;
     }
 }
+
+
+
 public class WorkoutName{
     public string Name{get;}
     public WorkoutName(string name){
@@ -64,21 +67,17 @@ public class Groups
 public class Workoutdata
 {
     public WorkoutName WorkoutName { get; }
-    public float WorkoutDuration{ get; } 
+    public float WorkoutDuration { get; }
     public User User { get; }
     public DateTime TimeStamp { get; }
-    public Groups Groups { get; }
 
-    public Workoutdata(WorkoutName workoutName, float workoutDuration, User user, DateTime timeStamp, Groups groups)
+    public Workoutdata(WorkoutName workoutName, float workoutDuration, User user, DateTime timeStamp)
     {
         this.WorkoutName = workoutName;
         this.WorkoutDuration = workoutDuration;
         this.User = user;
         this.TimeStamp = timeStamp;
-        this.Groups = groups;
     }
-
-
 }
 
 public class WorkoutManager
