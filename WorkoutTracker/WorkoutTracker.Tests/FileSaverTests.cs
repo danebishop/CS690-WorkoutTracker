@@ -35,6 +35,6 @@ public class FileSaverTests
         Workoutdata sampleData = new Workoutdata(sampleWorkoutName, sampleDuration, sampleUser, sampleTimeStamp);
         fileSaver.AppendWorkoutData(sampleData);
         var contentFromFile = File.ReadAllText(testFileName);
-        Assert.Equal("sampleWorkout;10;sampleUser;"+sampleTimeStamp+";sampleGroup"+Environment.NewLine, contentFromFile);
+        Assert.Equal("sampleWorkout;10;sampleUser;"+sampleTimeStamp+Environment.NewLine, contentFromFile);
     }
 }
