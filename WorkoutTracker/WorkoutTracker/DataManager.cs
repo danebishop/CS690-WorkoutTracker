@@ -105,13 +105,9 @@ public class DataManager{
                     Console.WriteLine($"Invalid date format: {splitted[3]}");
                     continue; // Skip this line
                 }
-
-                // Groups
-                var group = splitted[4];
-                var groups = new Groups(group);
-
-                // Adding Workout data
-                WorkoutStoredData.Add(new Workoutdata(workout, workoutDuration, user, dateTime, groups));
+                WorkoutStoredData.Add(new Workoutdata(workout, workoutDuration, user, dateTime));
+                
+                
             }
         }
 
@@ -210,6 +206,60 @@ public class DataManager{
         Groups.Add(newGroup);
         SaveGroups();  // Save changes to file
         Console.WriteLine($"New group {groupName} created and {userName} added.");
-    }   
+    }  
+
+    public List<string> GetUserGroups(User user)
+    {
+        List<string> userGroups = new List<string>();
+
+        foreach (var group in Groups)
+        {
+            if (group.Users.Contains(user))
+            {
+                userGroups.Add(group.Name);
+            }
+        }
+
+        return userGroups;
+    }
+
+    public List<User> GetGroupUsers(string groupName)
+    {
+        List<User> groupUsers = new List<User>();
+
+        foreach (var group in Groups)
+        {
+            if (group.Name == groupName)
+            {
+                groupUsers = group.Users;  // Assuming each Group has a list of users
+                break;
+            }
+        }
+
+        return groupUsers;
+    }
+
+    public List<Workoutdata> GetWorkoutsByUser(User user)
+    {
+        return WorkoutStoredData.Where(workout => workout.User == user).ToList();
+    }
+
+
+    public List<Workoutdata> GetGroupWorkouts(string groupName)
+    {
+        List<Workoutdata> groupWorkouts = new List<Workoutdata>();
+
+        // Get all users in the group
+        List<User> groupUsers = GetGroupUsers(groupName);
+
+        // Get all workouts for each user
+        foreach (var user in groupUsers)
+        {
+            var userWorkouts = GetWorkoutsByUser(user); // Get all workouts by the user
+            groupWorkouts.AddRange(userWorkouts); // Add them to the list
+        }
+
+        return groupWorkouts;
+    }
 
 }

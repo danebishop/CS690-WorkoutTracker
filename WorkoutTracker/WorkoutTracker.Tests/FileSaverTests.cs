@@ -31,11 +31,10 @@ public class FileSaverTests
         User sampleUser = new User("sampleUser");
         var sampleDuration = 10;
         DateTime sampleTimeStamp = DateTime.Now;
-        var workoutGroup = "sampleGroup";
-        Groups sampleGroup = new Groups(workoutGroup);
-        Workoutdata sampleData = new Workoutdata(sampleWorkoutName, sampleDuration, sampleUser, sampleTimeStamp, sampleGroup);
+        
+        Workoutdata sampleData = new Workoutdata(sampleWorkoutName, sampleDuration, sampleUser, sampleTimeStamp);
         fileSaver.AppendWorkoutData(sampleData);
         var contentFromFile = File.ReadAllText(testFileName);
-        Assert.Equal("sampleWorkout;10;sampleUser;"+sampleTimeStamp+";sampleGroup"+Environment.NewLine, contentFromFile);
+        Assert.Equal("sampleWorkout;10;sampleUser;"+sampleTimeStamp+Environment.NewLine, contentFromFile);
     }
 }

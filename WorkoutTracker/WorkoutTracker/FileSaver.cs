@@ -17,7 +17,7 @@ public class FileSaver{
     }
 
     public void AppendWorkoutData(Workoutdata data){
-        File.AppendAllText(this.fileName, data.WorkoutName + ";" + data.WorkoutDuration + ";"+ data.User + ";" + data.TimeStamp + ";" + data.Groups + Environment.NewLine);
+        File.AppendAllText(this.fileName, data.WorkoutName + ";" + data.WorkoutDuration + ";"+ data.User + ";" + data.TimeStamp + Environment.NewLine);
     }
 
 
