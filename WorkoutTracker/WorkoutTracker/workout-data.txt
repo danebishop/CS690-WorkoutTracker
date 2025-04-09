@@ -12,3 +12,4 @@ Climbing Trees;8;Ragdoll;04/08/2025 16:22:32
 Climbing Trees;9;Ragdoll;04/08/2025 16:22:36
 Climbing Trees;4;Persian;04/08/2025 16:22:53
 Climbing Trees;3;Persian;04/08/2025 16:22:55
+Climbing Trees;25;Manx;04/09/2025 15:11:02
