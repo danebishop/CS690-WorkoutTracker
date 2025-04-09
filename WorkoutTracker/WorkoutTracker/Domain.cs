@@ -10,12 +10,12 @@ public class User{
         if (obj == null || GetType() != obj.GetType())
             return false;
         User other = (User)obj;
-        return this.Name == other.Name; 
+        return string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase);
     }
 
     public override int GetHashCode()
     {
-        return Name.GetHashCode();  
+        return StringComparer.OrdinalIgnoreCase.GetHashCode(Name);
     }
 
     public override string ToString(){
@@ -82,7 +82,7 @@ public class Workoutdata
 
 public class WorkoutManager
     {
-        private List<Workoutdata> WorkoutStoredData;
+        public List<Workoutdata> WorkoutStoredData;
 
         public WorkoutManager(List<Workoutdata> workoutStoredData)
         {
@@ -101,5 +101,9 @@ public class WorkoutManager
             }
 
             return uniqueWorkoutNames.ToList();
+        }
+        public List<string> GetPopularWorkouts(int minimumCount = 2)
+        {
+            return WorkoutStoredData.GroupBy(w => w.WorkoutName.Name).Where(g => g.Count() >= minimumCount).Select(g => g.Key).ToList();
         }
     }

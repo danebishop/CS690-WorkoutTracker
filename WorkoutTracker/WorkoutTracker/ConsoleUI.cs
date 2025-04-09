@@ -397,137 +397,117 @@ public class ConsoleUI
                                         }
 
                                         var selectedGroup = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Select the group you want to report or analyze:").AddChoices(userGroups));
-
-                                        var groupOption = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Select an option:").AddChoices(new[] { "Report Group Workouts", "Analyze Group Workouts", "Exit" }));
-
-                                        if (groupOption == "Report Group Workouts")
+                                        
+                                        var usersInGroup = dataManager.GetGroupUsers(selectedGroup);
+                                        
+                                        Console.WriteLine($"Users in group '{selectedGroup}':");
+                                        foreach (var user in usersInGroup)
                                         {
-                                            AnsiConsole.Write(new Markup("You selected to[green] Report Group Workouts [/]\n"));
-                                            var groupWorkouts = dataManager.GetGroupWorkouts(selectedGroup);
-                                            if (groupWorkouts.Count == 0)
-                                                {
-                                                    AnsiConsole.MarkupLine("[red]No workouts found for this group.[/]");
-                                                    continue;
-                                                }
-
-                                            //Get workouts that have at least 2 data entries    
-                                            var workoutCounts = groupWorkouts.GroupBy(w => w.WorkoutName.Name).Where(g => g.Count() >= 2).ToDictionary(g => g.Key, g => g.Count());
-                                            if (workoutCounts.Count == 0)
-                                            {
-                                                AnsiConsole.MarkupLine("[yellow]No workouts found with at least two entries in this group.[/]");
-                                                continue;
-                                            }
-
-                                            var groupWorkoutSelection = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Choose a workout to report on:").AddChoices(workoutCounts.Keys));
-                                            
-                                            var chosenWorkout = groupWorkouts.Where(w => w.WorkoutName.Name == groupWorkoutSelection).ToList();
-                                                // Build report table
-                                            var reportTable = new Table();
-                                            reportTable.AddColumn("[yellow]User[/]");
-                                            reportTable.AddColumn("[yellow]Duration (min)[/]");
-                                            reportTable.AddColumn("[yellow]Date[/]");
-
-                                            foreach (var workout in chosenWorkout)
-                                            {
-                                                reportTable.AddRow(
-                                                    workout.User.ToString(),
-                                                    workout.WorkoutDuration.ToString("0.##"),
-                                                    workout.TimeStamp.ToShortDateString()
-                                                );
-                                            }
-
-                                            AnsiConsole.MarkupLine($"[bold green]Report for workout:[/] [white]{groupWorkoutSelection}[/]");
-                                            AnsiConsole.Write(reportTable);
-                                            
+                                            Console.WriteLine($"- {user.Name}");
                                         }
-                                        else if (groupOption == "Analyze Group Workouts")
+
+                                        var groupWorkoutData = dataManager.WorkoutStoredData.Where(w => usersInGroup.Contains(w.User)).ToList();
+                                        var groupWorkoutManager = new WorkoutManager(groupWorkoutData);
+                                        var commonWorkouts = groupWorkoutManager.GetPopularWorkouts();
+
+                                        
+
+                                        if (commonWorkouts.Count == 0)
                                         {
-                                            AnsiConsole.Write(new Markup("You selected to[green] Analyze Group Workouts [/]\n"));
-                                            var groupWorkouts = dataManager.GetGroupWorkouts(selectedGroup);
-                                            if (groupWorkouts.Count == 0)
-                                                {
-                                                    AnsiConsole.MarkupLine("[red]No workouts found for this group.[/]");
-                                                    continue;
-                                                }
-
-                                            //Get workouts that have at least 2 data entries    
-                                            var workoutCounts = groupWorkouts.GroupBy(w => w.WorkoutName.Name).Where(g => g.Count() >= 2).ToDictionary(g => g.Key, g => g.Count());
-                                            if (workoutCounts.Count == 0)
-                                            {
-                                                AnsiConsole.MarkupLine("[yellow]No workouts found with at least two entries in this group.[/]");
-                                                continue;
-                                            }
-
-                                            var groupWorkoutSelection = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Choose a workout to report on:").AddChoices(workoutCounts.Keys));
-                                            
-                                            var chosenWorkout = groupWorkouts.Where(w => w.WorkoutName.Name == groupWorkoutSelection).ToList();
-                                                // Extract workout durations for the selected group workout
-                                            List<float> durations = chosenWorkout.Select(workout => workout.WorkoutDuration).ToList();
-
-                                            // Calculate Mean
-                                            float mean = durations.Average();
-
-                                            // Calculate Median
-                                            float median;
-                                            var sortedDurations = durations.OrderBy(d => d).ToList();
-                                            int count = sortedDurations.Count;
-                                            if (count % 2 == 0)
-                                            {
-                                                // Average of the two middle numbers if even
-                                                median = (sortedDurations[count / 2 - 1] + sortedDurations[count / 2]) / 2;
-                                            }
-                                            else
-                                            {
-                                                // Middle number if odd
-                                                median = sortedDurations[count / 2];
-                                            }
-
-                                            // Calculate Max, min & number of workouts
-                                            float maxDuration = durations.Max();
-                                            float minDuration = durations.Min();
-                                            int timesLogged = chosenWorkout.Count;
-
-                                            // Create a report table for the group workout statistics
-                                            var statsTable = new Spectre.Console.Table();
-                                            statsTable.AddColumn("Statistic").Centered();
-                                            statsTable.AddColumn("Value").Centered();
-
-                                            // Add rows with statistics
-                                            statsTable.AddRow("Mean Duration", $"{mean} minutes");
-                                            statsTable.AddRow("Median Duration", $"{median} minutes");
-                                            statsTable.AddRow("Maximum Duration", $"{maxDuration} minutes");
-                                            statsTable.AddRow("Minimum Duration", $"{minDuration} minutes");
-                                            statsTable.AddRow("Times Logged", $"{timesLogged}");
-
-                                            // Render the statistics table to the console
-                                            AnsiConsole.MarkupLine($"[bold green]Analysis for group workout:[/] [white]{groupWorkoutSelection}[/]");
-                                            AnsiConsole.Write(statsTable);
-
-                                            // Build a detailed report table with individual workout data
-                                            var reportTable = new Table();
-                                            reportTable.AddColumn("[yellow]User[/]");
-                                            reportTable.AddColumn("[yellow]Duration (min)[/]");
-                                            reportTable.AddColumn("[yellow]Date[/]");
-
-                                            foreach (var workout in chosenWorkout)
-                                            {
-                                                reportTable.AddRow(
-                                                    workout.User.ToString(),
-                                                    workout.WorkoutDuration.ToString("0.##"),
-                                                    workout.TimeStamp.ToShortDateString()
-                                                );
-                                            }
-
-                                            AnsiConsole.Write(reportTable);
-                                            
-
-
+                                            AnsiConsole.MarkupLine("[red]No workouts found with at least 2 entries.[/]");
+                                            continue;
                                         }
                                         else
                                         {
-                                            Console.WriteLine("Exiting group data options.");
+                                            var groupOption = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Select an option:").AddChoices(new[] { "Report Group Workouts", "Analyze Group Workouts", "Exit" }));
+                                            if (groupOption == "Report Group Workouts")
+                                            {
+                                                AnsiConsole.Write(new Markup("You selected to[green] Report Group Workouts [/]\n"));
+                                                string groupWorkoutSelection = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(commonWorkouts.ToArray()));
+                                                AnsiConsole.Write(new Markup($"You selected [green]{groupWorkoutSelection}[/]\n"));
+                                                var chosenWorkout = groupWorkoutManager.WorkoutStoredData.Where(w => w.WorkoutName.Name == groupWorkoutSelection).ToList();
+                                                // Create the report table
+                                                var reportTable = new Spectre.Console.Table();
+                                                reportTable.AddColumn("[yellow]User[/]").Centered();
+                                                reportTable.AddColumn("[yellow]Workout[/]").Centered();
+                                                reportTable.AddColumn("[yellow]Reps/Duration[/]").Centered();
+                                                reportTable.AddColumn("[yellow]Timestamp[/]").Centered();
+
+                                                // Populate table
+                                                foreach (var workout in chosenWorkout)
+                                                {
+                                                    reportTable.AddRow(
+                                                        workout.User.Name,
+                                                        workout.WorkoutName.ToString(),
+                                                        workout.WorkoutDuration.ToString("0.##"),
+                                                        workout.TimeStamp.ToString("g")  // General short datetime format
+                                                    );
+                                                }
+
+                                                // Display the report
+                                                AnsiConsole.MarkupLine($"[bold green]Report for group workout:[/] [white]{groupWorkoutSelection}[/]");
+                                                AnsiConsole.Write(reportTable);
+                                                continue;
+                                                
+                                            }
+                                            else if (groupOption == "Analyze Group Workouts")
+                                            {
+                                                AnsiConsole.Write(new Markup("You selected to[green] Analyze Group Workouts [/]\n"));
+                                                string groupWorkoutSelection = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(commonWorkouts.ToArray()));
+                                                AnsiConsole.Write(new Markup($"You selected [green]{groupWorkoutSelection}[/]\n"));
+                                                var chosenWorkout = groupWorkoutManager.WorkoutStoredData.Where(w => w.WorkoutName.Name == groupWorkoutSelection).ToList();
+                                                var durations = chosenWorkout.Select(w => w.WorkoutDuration).ToList();
+                                                durations.Sort();
+
+
+                                                float mean = durations.Average();
+                                                float median = durations.Count % 2 == 0
+                                                    ? (durations[durations.Count / 2 - 1] + durations[durations.Count / 2]) / 2
+                                                    : durations[durations.Count / 2];
+
+                                                var lowest = chosenWorkout.OrderBy(w => w.WorkoutDuration).First();
+                                                var highest = chosenWorkout.OrderByDescending(w => w.WorkoutDuration).First();
+
+                                                // --- Table: Lowest and Highest ---
+                                                var extremaTable = new Table();
+                                                extremaTable.AddColumn("[green]Type[/]").Centered();
+                                                extremaTable.AddColumn("[green]User[/]").Centered();
+                                                extremaTable.AddColumn("[green]Duration/Reps[/]").Centered();
+                                                extremaTable.AddColumn("[green]Date[/]").Centered();
+
+                                                extremaTable.AddRow("Lowest",
+                                                    lowest.User.Name,
+                                                    lowest.WorkoutDuration.ToString("0.##"),
+                                                    lowest.TimeStamp.ToString("g"));
+
+                                                extremaTable.AddRow("Highest",
+                                                    highest.User.Name,
+                                                    highest.WorkoutDuration.ToString("0.##"),
+                                                    highest.TimeStamp.ToString("g"));
+
+                                                AnsiConsole.MarkupLine($"\n[bold yellow]Group Extremes for:[/] [white]{groupWorkoutSelection}[/]");
+                                                AnsiConsole.Write(extremaTable);
+
+                                                // --- Table: Mean and Median ---
+                                                var statsTable = new Table();
+                                                statsTable.AddColumn("[blue]Statistic[/]").Centered();
+                                                statsTable.AddColumn("[blue]Value[/]").Centered();
+
+                                                statsTable.AddRow("Mean Duration/Reps", $"{mean:0.##} minutes");
+                                                statsTable.AddRow("Median Duration/Reps", $"{median:0.##} minutes");
+
+                                                AnsiConsole.MarkupLine($"\n[bold yellow]Group Stats for:[/] [white]{groupWorkoutSelection}[/]");
+                                                AnsiConsole.Write(statsTable);
+                                                
+                                                continue;
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine("Exiting group data options.");
+                                            }
+
                                         }
-                                                                            
+                                          
                                     }
                                     else
                                     {
