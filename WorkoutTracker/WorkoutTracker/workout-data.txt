@@ -13,3 +13,5 @@ Climbing Trees;9;Ragdoll;04/08/2025 16:22:36
 Climbing Trees;4;Persian;04/08/2025 16:22:53
 Climbing Trees;3;Persian;04/08/2025 16:22:55
 Climbing Trees;25;Manx;04/09/2025 15:11:02
+Running a Mile;5.78;Manx;04/09/2025 16:29:04
+Push Ups;10;Manx;04/10/2025 14:33:36
