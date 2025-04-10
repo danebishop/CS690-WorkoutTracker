@@ -184,7 +184,7 @@ public class ConsoleUI
                                 }
                                 else if(selectionMode == "Workout Reports")
                                 {
-                                    AnsiConsole.Write(new FigletText("Workout Reports").Color(Color.Orange3));
+                                    AnsiConsole.Write(new FigletText("Workout Reports").Color(Color.Green));
                                                                   
                                     
                                     var reportType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Choose [green]one[/] please:").AddChoices(new[]{"Report Data","Analyze Reports","Group Data","Exit"}));
@@ -206,9 +206,9 @@ public class ConsoleUI
 
                                             // Create a report table
                                             var reportTable = new Spectre.Console.Table();
-                                            reportTable.AddColumn("Workout").Centered();
-                                            reportTable.AddColumn("Reps/Duration").Centered();
-                                            reportTable.AddColumn("Timestamp").Centered();
+                                            reportTable.AddColumn("[green]Workout[/]").Centered();
+                                            reportTable.AddColumn("[green]Reps/Duration[/]").Centered();
+                                            reportTable.AddColumn("[green]Timestamp[/]").Centered();
                                         
                                             // Add some rows
                                             foreach (var workout in chosenWorkout)
@@ -234,9 +234,9 @@ public class ConsoleUI
                                             
                                             // Create a report table
                                             var reportTable = new Spectre.Console.Table();
-                                            reportTable.AddColumn("Workout").Centered();
-                                            reportTable.AddColumn("Reps/Duration").Centered();
-                                            reportTable.AddColumn("Timestamp").Centered();
+                                            reportTable.AddColumn("[green]Workout[/]").Centered();
+                                            reportTable.AddColumn("[green]Reps/Duration[/]").Centered();
+                                            reportTable.AddColumn("[green]Timestamp[/]").Centered();
 
                                             // Add rows to the table
                                             foreach (var workout in chosenWorkout)
@@ -258,6 +258,7 @@ public class ConsoleUI
                                     }
                                     else if(reportType == "Analyze Reports")
                                     {
+                                        AnsiConsole.Write(new FigletText("Analyze Reports").Color(Color.Blue));
                                         var analyzeDataType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Choose [green]one[/] please:").AddChoices(new[]{"Analyze All Data","Analyze Your Data Only","Exit"}));
                                         
                                         if (analyzeDataType == "Analyze All Data")
@@ -300,15 +301,15 @@ public class ConsoleUI
                                             // Create a report table for the statistics
                                             var statsTable = new Spectre.Console.Table();
                                             // Add columns and label them
-                                            statsTable.AddColumn("Statistic").Centered();
-                                            statsTable.AddColumn("Value").Centered();
+                                            statsTable.AddColumn("[blue]Statistic[/]").Centered();
+                                            statsTable.AddColumn("[blue]Value[/]").Centered();
 
                                             // Add rows with statistics
-                                            statsTable.AddRow("Mean Duration", $"{mean} minutes");
-                                            statsTable.AddRow("Median Duration", $"{median} minutes");
-                                            statsTable.AddRow("Maximum Duration", $"{maxDuration} minutes");
-                                            statsTable.AddRow("Minimum Duration", $"{minDuration} minutes");
-                                            statsTable.AddRow("Times Logged", $"{timesLogged}");
+                                            statsTable.AddRow("Mean Duration/Reps", $"{mean}");
+                                            statsTable.AddRow("Median Duration/Reps", $"{median}");
+                                            statsTable.AddRow("Maximum Duration/Reps", $"{maxDuration}");
+                                            statsTable.AddRow("Minimum Duration/Reps", $"{minDuration}");
+                                            statsTable.AddRow("Total Workouts", $"{timesLogged}");
 
                                             // Render the statistics table to the console
                                             AnsiConsole.MarkupLine($"[bold green]Analysis for workout:[/] [white]{workoutTypeAnalyze}[/]");
@@ -360,15 +361,15 @@ public class ConsoleUI
                                             // Create a report table for the statistics
                                             var statsTable = new Spectre.Console.Table();
                                             // Add columns and label them
-                                            statsTable.AddColumn("Statistic").Centered();
-                                            statsTable.AddColumn("Value").Centered();
-
+                                            statsTable.AddColumn("[blue]Statistic[/]").Centered();
+                                            statsTable.AddColumn("[blue]Value[/]").Centered();
+                                            
                                             // Add rows with statistics
-                                            statsTable.AddRow("Mean Duration", $"{mean} minutes");
-                                            statsTable.AddRow("Median Duration", $"{median} minutes");
-                                            statsTable.AddRow("Maximum Duration", $"{maxDuration} minutes");
-                                            statsTable.AddRow("Minimum Duration", $"{minDuration} minutes");
-                                            statsTable.AddRow("Times Logged", $"{timesLogged}");
+                                            statsTable.AddRow("Mean Duration/Reps", $"{mean}");
+                                            statsTable.AddRow("Median Duration/Reps", $"{median}");
+                                            statsTable.AddRow("Maximum Duration/Reps", $"{maxDuration}");
+                                            statsTable.AddRow("Minimum Duration/Reps", $"{minDuration}");
+                                            statsTable.AddRow("Total Workouts", $"{timesLogged}");
 
                                             // Render the statistics table to the console
                                             AnsiConsole.MarkupLine($"[bold green]Analysis for workout:[/] [white]{workoutTypeAnalyze}[/]");
@@ -386,7 +387,8 @@ public class ConsoleUI
                                     }
                                     else if(reportType == "Group Data")
                                     {    
-                                        AnsiConsole.Write(new Markup("You selected to[green] Examine Group Data [/]\n"));
+                                        AnsiConsole.Write(new FigletText("Group Data").Color(Color.DeepPink3));
+                                        
 
                                         List<string> userGroups = dataManager.GetUserGroups(currentUser);
 
@@ -428,10 +430,10 @@ public class ConsoleUI
                                                 var chosenWorkout = groupWorkoutManager.WorkoutStoredData.Where(w => w.WorkoutName.Name == groupWorkoutSelection).ToList();
                                                 // Create the report table
                                                 var reportTable = new Spectre.Console.Table();
-                                                reportTable.AddColumn("[yellow]User[/]").Centered();
-                                                reportTable.AddColumn("[yellow]Workout[/]").Centered();
-                                                reportTable.AddColumn("[yellow]Reps/Duration[/]").Centered();
-                                                reportTable.AddColumn("[yellow]Timestamp[/]").Centered();
+                                                reportTable.AddColumn("[deeppink3]User[/]").Centered();
+                                                reportTable.AddColumn("[deeppink3]Workout[/]").Centered();
+                                                reportTable.AddColumn("[deeppink3]Reps/Duration[/]").Centered();
+                                                reportTable.AddColumn("[deeppink3]Timestamp[/]").Centered();
 
                                                 // Populate table
                                                 foreach (var workout in chosenWorkout)
@@ -470,33 +472,27 @@ public class ConsoleUI
 
                                                 // --- Table: Lowest and Highest ---
                                                 var extremaTable = new Table();
-                                                extremaTable.AddColumn("[green]Type[/]").Centered();
-                                                extremaTable.AddColumn("[green]User[/]").Centered();
-                                                extremaTable.AddColumn("[green]Duration/Reps[/]").Centered();
-                                                extremaTable.AddColumn("[green]Date[/]").Centered();
+                                                extremaTable.AddColumn("[deeppink3]Type[/]").Centered();
+                                                extremaTable.AddColumn("[deeppink3]User[/]").Centered();
+                                                extremaTable.AddColumn("[deeppink3]Duration/Reps[/]").Centered();
+                                                extremaTable.AddColumn("[deeppink3]Date[/]").Centered();
 
-                                                extremaTable.AddRow("Lowest",
-                                                    lowest.User.Name,
-                                                    lowest.WorkoutDuration.ToString("0.##"),
-                                                    lowest.TimeStamp.ToString("g"));
+                                                extremaTable.AddRow("Lowest",lowest.User.Name,lowest.WorkoutDuration.ToString("0.##"),lowest.TimeStamp.ToString("g"));
 
-                                                extremaTable.AddRow("Highest",
-                                                    highest.User.Name,
-                                                    highest.WorkoutDuration.ToString("0.##"),
-                                                    highest.TimeStamp.ToString("g"));
+                                                extremaTable.AddRow("Highest",highest.User.Name,highest.WorkoutDuration.ToString("0.##"),highest.TimeStamp.ToString("g"));
 
-                                                AnsiConsole.MarkupLine($"\n[bold yellow]Group Extremes for:[/] [white]{groupWorkoutSelection}[/]");
+                                                AnsiConsole.MarkupLine($"\n[bold deeppink3]Group Extremes for:[/] [white]{groupWorkoutSelection}[/]");
                                                 AnsiConsole.Write(extremaTable);
 
                                                 // --- Table: Mean and Median ---
                                                 var statsTable = new Table();
-                                                statsTable.AddColumn("[blue]Statistic[/]").Centered();
-                                                statsTable.AddColumn("[blue]Value[/]").Centered();
+                                                statsTable.AddColumn("[deeppink3]Statistic[/]").Centered();
+                                                statsTable.AddColumn("[deeppink3]Value[/]").Centered();
 
-                                                statsTable.AddRow("Mean Duration/Reps", $"{mean:0.##} minutes");
-                                                statsTable.AddRow("Median Duration/Reps", $"{median:0.##} minutes");
+                                                statsTable.AddRow("Mean Duration/Reps", $"{mean:0.##}");
+                                                statsTable.AddRow("Median Duration/Reps", $"{median:0.##}");
 
-                                                AnsiConsole.MarkupLine($"\n[bold yellow]Group Stats for:[/] [white]{groupWorkoutSelection}[/]");
+                                                AnsiConsole.MarkupLine($"\n[bold deeppink3]Group Stats for:[/] [white]{groupWorkoutSelection}[/]");
                                                 AnsiConsole.Write(statsTable);
                                                 
                                                 continue;
