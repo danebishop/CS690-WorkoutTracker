@@ -1,548 +1,309 @@
 namespace WorkoutTracker;
 
 using System.ComponentModel;
-using Spectre.Console; 
-
+using Spectre.Console;
 
 public class ConsoleUI
 {
-    DataManager dataManager;
- 
+    private readonly DataManager dataManager;
+
     public ConsoleUI()
     {
-        dataManager  = new DataManager();
+        dataManager = new DataManager();
     }
 
     public void Show()
     {
         AnsiConsole.Write(new FigletText("Workout Tracker").Color(Color.Cyan1));
         var mode = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Please select mode").AddChoices(new[]{"Login","Create Account"}));
+
         if (mode == "Create Account")
-        {
-            AnsiConsole.Write(new Markup("You selected to [green]Create an Account[/]\n"));
-
-            bool isUnique;
-            string newUserName, newPassword, newPassword2;
-            newPassword = "";
-            newPassword2= "_";
-            do
-            {
-                newUserName = AnsiConsole.Prompt(new TextPrompt<string>("Enter new username(or 'exit' to quit):"));
-                isUnique = dataManager.UniqueUser(new User(newUserName));
-                if (newUserName == "exit")
-                {
-                    continue;
-                }
-                
-            }while (isUnique == false);
-
-            if (newUserName != "exit")
-            {
-                do
-                {
-                    newPassword = AnsiConsole.Prompt(new TextPrompt<string>("Enter password:"));
-                    newPassword2 = AnsiConsole.Prompt(new TextPrompt<string>("Re-enter password:"));
-                    if (newPassword != newPassword2)
-                    {
-                        Console.WriteLine("Passwords don't match, please try again");
-                    }
-                    else
-                    {
-                        continue;
-                    }
-                }while(newPassword != newPassword2);
-
-            }
-            if (newUserName != "exit")
-            {
-                dataManager.AddUser(new User(newUserName), new UserPassword(newPassword));
-            }            
-        } 
-
-        if (mode == "Login")
-        {
-            AnsiConsole.Write(new FigletText("Login").Color(Color.Yellow2));
-            string userName, enteredPassword;
-            User currentUser = null;
-            UserPassword userStoredPassword = null;
-            do
-            {
-                userName = AnsiConsole.Prompt(new TextPrompt<string>("Enter your username(or 'exit' to quit):"));
-                if (userName == "exit")
-                {
-                    break;
-                }
-                User userToCheck = new User(userName);
-                bool userExists = dataManager.UserDictionary.ContainsKey(userToCheck);
-                if(userExists)
-                {
-                    currentUser = userToCheck;
-                    userStoredPassword = dataManager.UserDictionary[userToCheck];
-
-                    bool passwordCorrect = false;
-                    do
-                    {
-                        enteredPassword = AnsiConsole.Prompt(new TextPrompt<string>("Enter your password(or 'exit' to quit):"));
-                        if (enteredPassword == "exit")
-                        {
-                            break;
-                        }
-
-                        if (enteredPassword == userStoredPassword.ToString())
-                        {
-                            Console.WriteLine("Login Successful");
-                            //This is where all the other functionality goes
-                            //
-                            bool continueNextSteps = true;
-
-                            while(continueNextSteps)
-                            {
-                                var selectionMode = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Please select mode").AddChoices(new[]{"Workout Tracking","Workout Reports","Join Group","Logout"}));
-                                if (selectionMode == "Join Group")
-                                {
-                                    AnsiConsole.Write(new FigletText("Join a Group").Color(Color.Blue3));
-                                    
-                                    // Get unique group names using a HashSet
-                                    HashSet<string> uniqueGroupNames = new HashSet<string>();
-                                    foreach (var group in dataManager.Groups)
-                                    {
-                                        uniqueGroupNames.Add(group.Name);  // Add the workout name to the HashSet
-                                    }
-
-                                    List<string> uniqueGroupNamesList = uniqueGroupNames.ToList();
-                                    var userGroupChoice = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Select the Group to join or form a new group:").AddChoices(uniqueGroupNamesList.Concat(new[] { "New Group" }).ToArray()));
-                                    
-                                    if (userGroupChoice == "New Group")
-                                    {
-                                        var newGroupName = AnsiConsole.Prompt(new TextPrompt<string>("Enter name of new group:"));                                        
-                                        
-                                        if (uniqueGroupNamesList.Contains(newGroupName))
-                                        {
-                                            var joinChoice = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("This group already exists, would you like to join it instead?").AddChoices(new[] { "Yes", "No" }));
-                                            
-                                            if (joinChoice == "Yes")
-                                            {
-                                                // Add the user to the existing group
-                                                dataManager.AddUserToGroup(newGroupName, currentUser.ToString());
-                                                Console.WriteLine($"You have successfully joined the group: {newGroupName}");                                        
-                                            }
-                                            else
-                                            {
-                                                Console.WriteLine("Please enter a different group name.");
-                                            }
-                                        }                                    
-                                        else
-                                        {
-                                            // Create the new group and add the user to it
-                                            dataManager.CreateGroup(newGroupName, currentUser.ToString());
-                                            Console.WriteLine($"You have successfully created the group: {newGroupName} and joined it.");                                    
-                                        }
-                                    }
-                                    else
-                                    {
-                                        dataManager.AddUserToGroup(userGroupChoice, currentUser.ToString());
-                                        Console.WriteLine($"You have successfully joined the group: {userGroupChoice}");
-                                    
-                                    }
-                                }
-                                else if (selectionMode == "Workout Tracking")
-                                {
-                                    AnsiConsole.Write(new FigletText("Workout Tracking").Color(Color.Purple3));
-                                    
-                                    // Get unique workout names using a HashSet
-                                    HashSet<string> uniqueWorkoutNames = new HashSet<string>();
-                                    foreach (var workout in dataManager.WorkoutStoredData)
-                                    {
-                                        uniqueWorkoutNames.Add(workout.WorkoutName.Name);  // Add the workout name to the HashSet
-                                    }
-
-                                    List<string> uniqueWorkoutNamesList = uniqueWorkoutNames.ToList();
-                                    var workoutType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(uniqueWorkoutNamesList.Concat(new[] { "New Workout" }).ToArray()));
-                                    
-                                    if (workoutType == "New Workout")
-                                    {
-                                        var newWorkoutName = AnsiConsole.Prompt(new TextPrompt<string>("Enter new workout name:"));
-                                        var workoutDuration = float.Parse(AnsiConsole.Prompt(new TextPrompt<string>("Enter repetitions or time (min,sec):")));
-                                        var workoutGroup = "none";
-                                        WorkoutName workoutName = new WorkoutName(newWorkoutName);
-                                        Groups group = new Groups(workoutGroup);
-                                        DateTime timestamp = DateTime.Now;
-                                        Workoutdata data = new Workoutdata(workoutName, workoutDuration, currentUser, timestamp);
-                                        dataManager.AddNewWorkoutData(data);
-                                    }
-                                    else
-                                    {
-                                        AnsiConsole.Write(new Markup($"You selected [green]{workoutType}[/]\n"));
-                                        WorkoutName workoutName = new WorkoutName(workoutType);
-                                        var workoutDuration = float.Parse(AnsiConsole.Prompt(new TextPrompt<string>("Enter repetitions or time (min,sec):")));
-                                        var workoutGroup = "none";
-                                        Groups group = new Groups(workoutGroup);
-                                        DateTime timestamp = DateTime.Now;
-                                        Workoutdata data = new Workoutdata(workoutName, workoutDuration, currentUser, timestamp);
-                                        dataManager.AddNewWorkoutData(data);
-                                    }
-                                }
-                                else if(selectionMode == "Workout Reports")
-                                {
-                                    AnsiConsole.Write(new FigletText("Workout Reports").Color(Color.Green));
-                                                                  
-                                    
-                                    var reportType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Choose [green]one[/] please:").AddChoices(new[]{"Report Data","Analyze Reports","Group Data","Exit"}));
-                                    
-                                    AnsiConsole.Write(new Markup($"You selected [green]{reportType}[/]\n"));
-                                    if (reportType == "Report Data")
-                                    {
-                                        var reportDataType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Choose [green]one[/] please:").AddChoices(new[]{"Report All Data","Report Your Data Only","Exit"}));
-                                        AnsiConsole.Write(new Markup($"You selected [green]{reportDataType}[/]\n"));
-
-                                        if (reportDataType == "Report All Data")
-                                        {
-                                            WorkoutManager workoutManager = new WorkoutManager(dataManager.WorkoutStoredData);
-                                            List<string> uniqueWorkoutNames = workoutManager.GetUniqueWorkoutNames();
-                                            string workoutTypeReport = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(uniqueWorkoutNames.ToArray()));
-                                            AnsiConsole.Write(new Markup($"You selected [green]{workoutTypeReport}[/]\n"));
-                                                                                        
-                                            List<Workoutdata> chosenWorkout = dataManager.GetWorkoutsByName(workoutTypeReport);
-
-                                            // Create a report table
-                                            var reportTable = new Spectre.Console.Table();
-                                            reportTable.AddColumn("[green]Workout[/]").Centered();
-                                            reportTable.AddColumn("[green]Reps/Duration[/]").Centered();
-                                            reportTable.AddColumn("[green]Timestamp[/]").Centered();
-                                        
-                                            // Add some rows
-                                            foreach (var workout in chosenWorkout)
-                                            {
-                                                reportTable.AddRow(workout.WorkoutName.ToString(), workout.WorkoutDuration.ToString(), workout.TimeStamp.ToString());
-                                            }
-
-                                            // Render the table to the console
-                                            AnsiConsole.MarkupLine($"[bold green]Report for workout:[/] [white]{workoutTypeReport}[/]");
-                                            AnsiConsole.Write(reportTable);  
-
-                                        }
-                                        else if (reportDataType =="Report Your Data Only")
-                                        {
-                                            WorkoutManager workoutManager = new WorkoutManager(dataManager.WorkoutStoredData);
-                                            List<string> uniqueWorkoutNames = workoutManager.GetUniqueWorkoutNames();
-                                            string workoutTypeReport = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(uniqueWorkoutNames.ToArray()));
-                                            AnsiConsole.Write(new Markup($"You selected [green]{workoutTypeReport}[/]\n"));
-                                            
-                                            
-                                            List<Workoutdata> allWorkouts = dataManager.GetWorkoutsByName(workoutTypeReport);
-                                            List<Workoutdata> chosenWorkout = allWorkouts.Where(workout => workout.User.Name == currentUser.Name).ToList();
-                                            
-                                            // Create a report table
-                                            var reportTable = new Spectre.Console.Table();
-                                            reportTable.AddColumn("[green]Workout[/]").Centered();
-                                            reportTable.AddColumn("[green]Reps/Duration[/]").Centered();
-                                            reportTable.AddColumn("[green]Timestamp[/]").Centered();
-
-                                            // Add rows to the table
-                                            foreach (var workout in chosenWorkout)
-                                            {
-                                                reportTable.AddRow(workout.WorkoutName.ToString(), workout.WorkoutDuration.ToString(), workout.TimeStamp.ToString());
-                                            }
-
-                                            // Render the table to the console
-                                            AnsiConsole.MarkupLine($"[bold green]Report for workout:[/] [white]{workoutTypeReport}[/]");
-                                            AnsiConsole.Write(reportTable);
-
-                                        }
-                                        else
-                                        {
-                                            AnsiConsole.Write(new Markup("You selected[red] Exit [/]\n"));
-                                            continue;
-                                        }
-
-                                    }
-                                    else if(reportType == "Analyze Reports")
-                                    {
-                                        AnsiConsole.Write(new FigletText("Analyze Reports").Color(Color.Blue));
-                                        var analyzeDataType = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Choose [green]one[/] please:").AddChoices(new[]{"Analyze All Data","Analyze Your Data Only","Exit"}));
-                                        
-                                        if (analyzeDataType == "Analyze All Data")
-                                        {
-                                            AnsiConsole.Write(new Markup("You selected to[green] Analyze All Data [/].\n"));
-                                            WorkoutManager workoutManager = new WorkoutManager(dataManager.WorkoutStoredData);
-                                            List<string> uniqueWorkoutNames = workoutManager.GetUniqueWorkoutNames();
-                                            var workoutTypeAnalyze = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(uniqueWorkoutNames.ToArray()));
-                                            AnsiConsole.Write(new Markup($"You selected [green] {workoutTypeAnalyze} [/]\n"));
-
-                                            // Get all workouts by the selected workout name
-                                            List<Workoutdata> allWorkouts = dataManager.GetWorkoutsByName(workoutTypeAnalyze);
-
-                                            // Extract workout durations
-                                            List<float> durations = allWorkouts.Select(workout => workout.WorkoutDuration).ToList();
-
-                                            // Calculate Mean
-                                            float mean = durations.Average();
-
-                                            // Calculate Median
-                                            float median;
-                                            var sortedDurations = durations.OrderBy(d => d).ToList();
-                                            int count = sortedDurations.Count;
-                                            if (count % 2 == 0)
-                                            {
-                                                // Average of the two middle numbers if even
-                                                median = (sortedDurations[count / 2 - 1] + sortedDurations[count / 2]) / 2;
-                                            }
-                                            else
-                                            {
-                                                // Middle number if odd
-                                                median = sortedDurations[count / 2];
-                                            }
-
-                                            // Calculate Max, min & number of workouts
-                                            float maxDuration = durations.Max();
-                                            float minDuration = durations.Min();
-                                            int timesLogged = allWorkouts.Count;
-
-                                            // Create a report table for the statistics
-                                            var statsTable = new Spectre.Console.Table();
-                                            // Add columns and label them
-                                            statsTable.AddColumn("[blue]Statistic[/]").Centered();
-                                            statsTable.AddColumn("[blue]Value[/]").Centered();
-
-                                            // Add rows with statistics
-                                            statsTable.AddRow("Mean Duration/Reps", $"{mean}");
-                                            statsTable.AddRow("Median Duration/Reps", $"{median}");
-                                            statsTable.AddRow("Maximum Duration/Reps", $"{maxDuration}");
-                                            statsTable.AddRow("Minimum Duration/Reps", $"{minDuration}");
-                                            statsTable.AddRow("Total Workouts", $"{timesLogged}");
-
-                                            // Render the statistics table to the console
-                                            AnsiConsole.MarkupLine($"[bold green]Analysis for workout:[/] [white]{workoutTypeAnalyze}[/]");
-                                            AnsiConsole.Write(statsTable);
-                                            continue;
-
-                                        }
-                                        else if (analyzeDataType =="Analyze Your Data Only")
-                                        {
-                                            AnsiConsole.Write(new Markup("You selected to[green] Analyze Your Data [/]only.\n"));                                        
-                                            WorkoutManager workoutManager = new WorkoutManager(dataManager.WorkoutStoredData);
-                                            List<string> uniqueWorkoutNames = workoutManager.GetUniqueWorkoutNames();
-                                            var workoutTypeAnalyze = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(uniqueWorkoutNames.ToArray()));
-                                            AnsiConsole.Write(new Markup($"You selected [green] {workoutTypeAnalyze} [/]\n"));
-                                            
-                                           
-                                            // Get all workouts by the selected workout name
-                                            List<Workoutdata> allWorkouts = dataManager.GetWorkoutsByName(workoutTypeAnalyze);
-
-                                            // Filter workouts for the specific currentUser based on UserId
-                                            List<Workoutdata> chosenWorkout = allWorkouts.Where(workout => workout.User.Name == currentUser.Name).ToList();
-
-                                            // Extract workout durations
-                                            List<float> durations = chosenWorkout.Select(workout => workout.WorkoutDuration).ToList();
-
-                                            // Calculate Mean
-                                            float mean = durations.Average();
-
-                                            // Calculate Median
-                                            float median;
-                                            var sortedDurations = durations.OrderBy(d => d).ToList();
-                                            int count = sortedDurations.Count;
-                                            if (count % 2 == 0)
-                                            {
-                                                // Average of the two middle numbers if even
-                                                median = (sortedDurations[count / 2 - 1] + sortedDurations[count / 2]) / 2;
-                                            }
-                                            else
-                                            {
-                                                // Middle number if odd
-                                                median = sortedDurations[count / 2];
-                                            }
-
-                                            // Calculate Max, min & number of workouts
-                                            float maxDuration = durations.Max();
-                                            float minDuration = durations.Min();
-                                            int timesLogged = chosenWorkout.Count;
-
-                                            // Create a report table for the statistics
-                                            var statsTable = new Spectre.Console.Table();
-                                            // Add columns and label them
-                                            statsTable.AddColumn("[blue]Statistic[/]").Centered();
-                                            statsTable.AddColumn("[blue]Value[/]").Centered();
-                                            
-                                            // Add rows with statistics
-                                            statsTable.AddRow("Mean Duration/Reps", $"{mean}");
-                                            statsTable.AddRow("Median Duration/Reps", $"{median}");
-                                            statsTable.AddRow("Maximum Duration/Reps", $"{maxDuration}");
-                                            statsTable.AddRow("Minimum Duration/Reps", $"{minDuration}");
-                                            statsTable.AddRow("Total Workouts", $"{timesLogged}");
-
-                                            // Render the statistics table to the console
-                                            AnsiConsole.MarkupLine($"[bold green]Analysis for workout:[/] [white]{workoutTypeAnalyze}[/]");
-                                            AnsiConsole.Write(statsTable);
-                                            
-
-                                        }
-
-                                        else
-                                        {
-                                            AnsiConsole.Write(new Markup("You selected to[red] Exit [/].\n"));
-                                            continue;
-                                        }
-
-                                    }
-                                    else if(reportType == "Group Data")
-                                    {    
-                                        AnsiConsole.Write(new FigletText("Group Data").Color(Color.DeepPink3));
-                                        
-
-                                        List<string> userGroups = dataManager.GetUserGroups(currentUser);
-
-                                        if (userGroups.Count == 0)
-                                        {
-                                            Console.WriteLine("You are not part of any group.");
-                                            continue;
-                                        }
-
-                                        var selectedGroup = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Select the group you want to report or analyze:").AddChoices(userGroups));
-                                        
-                                        var usersInGroup = dataManager.GetGroupUsers(selectedGroup);
-                                        
-                                        Console.WriteLine($"Users in group '{selectedGroup}':");
-                                        foreach (var user in usersInGroup)
-                                        {
-                                            Console.WriteLine($"- {user.Name}");
-                                        }
-
-                                        var groupWorkoutData = dataManager.WorkoutStoredData.Where(w => usersInGroup.Contains(w.User)).ToList();
-                                        var groupWorkoutManager = new WorkoutManager(groupWorkoutData);
-                                        var commonWorkouts = groupWorkoutManager.GetPopularWorkouts();
-
-                                        
-
-                                        if (commonWorkouts.Count == 0)
-                                        {
-                                            AnsiConsole.MarkupLine("[red]No workouts found with at least 2 entries.[/]");
-                                            continue;
-                                        }
-                                        else
-                                        {
-                                            var groupOption = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Select an option:").AddChoices(new[] { "Report Group Workouts", "Analyze Group Workouts", "Exit" }));
-                                            if (groupOption == "Report Group Workouts")
-                                            {
-                                                AnsiConsole.Write(new Markup("You selected to[green] Report Group Workouts [/]\n"));
-                                                string groupWorkoutSelection = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(commonWorkouts.ToArray()));
-                                                AnsiConsole.Write(new Markup($"You selected [green]{groupWorkoutSelection}[/]\n"));
-                                                var chosenWorkout = groupWorkoutManager.WorkoutStoredData.Where(w => w.WorkoutName.Name == groupWorkoutSelection).ToList();
-                                                // Create the report table
-                                                var reportTable = new Spectre.Console.Table();
-                                                reportTable.AddColumn("[deeppink3]User[/]").Centered();
-                                                reportTable.AddColumn("[deeppink3]Workout[/]").Centered();
-                                                reportTable.AddColumn("[deeppink3]Reps/Duration[/]").Centered();
-                                                reportTable.AddColumn("[deeppink3]Timestamp[/]").Centered();
-
-                                                // Populate table
-                                                foreach (var workout in chosenWorkout)
-                                                {
-                                                    reportTable.AddRow(
-                                                        workout.User.Name,
-                                                        workout.WorkoutName.ToString(),
-                                                        workout.WorkoutDuration.ToString("0.##"),
-                                                        workout.TimeStamp.ToString("g")  // General short datetime format
-                                                    );
-                                                }
-
-                                                // Display the report
-                                                AnsiConsole.MarkupLine($"[bold green]Report for group workout:[/] [white]{groupWorkoutSelection}[/]");
-                                                AnsiConsole.Write(reportTable);
-                                                continue;
-                                                
-                                            }
-                                            else if (groupOption == "Analyze Group Workouts")
-                                            {
-                                                AnsiConsole.Write(new Markup("You selected to[green] Analyze Group Workouts [/]\n"));
-                                                string groupWorkoutSelection = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Workout Type").AddChoices(commonWorkouts.ToArray()));
-                                                AnsiConsole.Write(new Markup($"You selected [green]{groupWorkoutSelection}[/]\n"));
-                                                var chosenWorkout = groupWorkoutManager.WorkoutStoredData.Where(w => w.WorkoutName.Name == groupWorkoutSelection).ToList();
-                                                var durations = chosenWorkout.Select(w => w.WorkoutDuration).ToList();
-                                                durations.Sort();
-
-
-                                                float mean = durations.Average();
-                                                float median = durations.Count % 2 == 0
-                                                    ? (durations[durations.Count / 2 - 1] + durations[durations.Count / 2]) / 2
-                                                    : durations[durations.Count / 2];
-
-                                                var lowest = chosenWorkout.OrderBy(w => w.WorkoutDuration).First();
-                                                var highest = chosenWorkout.OrderByDescending(w => w.WorkoutDuration).First();
-
-                                                // --- Table: Lowest and Highest ---
-                                                var extremaTable = new Table();
-                                                extremaTable.AddColumn("[deeppink3]Type[/]").Centered();
-                                                extremaTable.AddColumn("[deeppink3]User[/]").Centered();
-                                                extremaTable.AddColumn("[deeppink3]Duration/Reps[/]").Centered();
-                                                extremaTable.AddColumn("[deeppink3]Date[/]").Centered();
-
-                                                extremaTable.AddRow("Lowest",lowest.User.Name,lowest.WorkoutDuration.ToString("0.##"),lowest.TimeStamp.ToString("g"));
-
-                                                extremaTable.AddRow("Highest",highest.User.Name,highest.WorkoutDuration.ToString("0.##"),highest.TimeStamp.ToString("g"));
-
-                                                AnsiConsole.MarkupLine($"\n[bold deeppink3]Group Extremes for:[/] [white]{groupWorkoutSelection}[/]");
-                                                AnsiConsole.Write(extremaTable);
-
-                                                // --- Table: Mean and Median ---
-                                                var statsTable = new Table();
-                                                statsTable.AddColumn("[deeppink3]Statistic[/]").Centered();
-                                                statsTable.AddColumn("[deeppink3]Value[/]").Centered();
-
-                                                statsTable.AddRow("Mean Duration/Reps", $"{mean:0.##}");
-                                                statsTable.AddRow("Median Duration/Reps", $"{median:0.##}");
-
-                                                AnsiConsole.MarkupLine($"\n[bold deeppink3]Group Stats for:[/] [white]{groupWorkoutSelection}[/]");
-                                                AnsiConsole.Write(statsTable);
-                                                
-                                                continue;
-                                            }
-                                            else
-                                            {
-                                                Console.WriteLine("Exiting group data options.");
-                                            }
-
-                                        }
-                                          
-                                    }
-                                    else
-                                    {
-                                        AnsiConsole.Write(new Markup("You selected to[red] Exit [/].\n"));
-                                        continue;
-                                    }
-
-                                }else{
-
-                                    Console.WriteLine("Logging out...");
-                                    continueNextSteps = false;
-                                }
-                                
-                            }
-                            break;//Break out of password loop since login was successful
-
-                        } 
-                        
-                        else
-                        {
-                            Console.WriteLine("Incorrect password, please try again");
-                        }
-                    }while(!passwordCorrect);
-                    
-                    if (enteredPassword == "exit")
-                    {
-                        break;
-                    }
-                }
-                
-                else
-                {
-                    Console.WriteLine("Username not found, try again");
-                }
-            }while(true);
-    
-        }   
+            HandleAccountCreation();
+        else if (mode == "Login")
+            HandleLogin();
     }
-    
 
+    private void HandleAccountCreation()
+    {
+        AnsiConsole.Write(new Markup("You selected to [green]Create an Account[/]\n"));
+        string newUserName;
+        do
+        {
+            newUserName = AnsiConsole.Prompt(new TextPrompt<string>("Enter new username(or 'exit' to quit):"));
+            if (newUserName == "exit") return;
+        } while (!dataManager.UniqueUser(new User(newUserName)));
+
+        string password, confirmPassword;
+        do
+        {
+            password = AnsiConsole.Prompt(new TextPrompt<string>("Enter password:"));
+            confirmPassword = AnsiConsole.Prompt(new TextPrompt<string>("Re-enter password:"));
+            if (password != confirmPassword)
+                Console.WriteLine("Passwords don't match, please try again");
+        } while (password != confirmPassword);
+
+        dataManager.AddUser(new User(newUserName), new UserPassword(password));
+    }
+
+    private void HandleLogin()
+    {
+        AnsiConsole.Write(new FigletText("Login").Color(Color.Yellow2));
+        while (true)
+        {
+            var userName = AnsiConsole.Prompt(new TextPrompt<string>("Enter your username(or 'exit' to quit):"));
+            if (userName == "exit") return;
+
+            var userToCheck = new User(userName);
+            if (!dataManager.UserDictionary.TryGetValue(userToCheck, out var storedPassword))
+            {
+                Console.WriteLine("Username not found, try again");
+                continue;
+            }
+
+            while (true)
+            {
+                var enteredPassword = AnsiConsole.Prompt(new TextPrompt<string>("Enter your password(or 'exit' to quit):"));
+                if (enteredPassword == "exit") return;
+
+                if (enteredPassword == storedPassword.ToString())
+                {
+                    Console.WriteLine("Login Successful");
+                    MainMenu(userToCheck);
+                    return;
+                }
+
+                Console.WriteLine("Incorrect password, please try again");
+            }
+        }
+    }
+
+    private void MainMenu(User currentUser)
+    {
+        bool continueNextSteps = true;
+        while (continueNextSteps)
+        {
+            var selection = AnsiConsole.Prompt(new SelectionPrompt<string>().Title("Please select mode").AddChoices(new[]{ "Workout Tracking","Workout Reports","Join Group","Logout" }));
+            switch (selection)
+            {
+                case "Workout Tracking":
+                    HandleWorkoutTracking(currentUser);
+                    break;
+                case "Workout Reports":
+                    HandleWorkoutReports(currentUser);
+                    break;
+                case "Join Group":
+                    HandleGroupManagement(currentUser);
+                    break;
+                case "Logout":
+                    Console.WriteLine("Logging out...");
+                    continueNextSteps = false;
+                    break;
+            }
+        }
+    }
+
+    private void HandleWorkoutTracking(User currentUser)
+    {
+        AnsiConsole.Write(new FigletText("Workout Tracking").Color(Color.Purple3));
+        var workoutNames = dataManager.WorkoutStoredData.Select(w => w.WorkoutName.Name).Distinct().ToList();
+        var workoutType = PromptSelection("Workout Type", workoutNames.Concat(new[] { "New Workout" }));
+
+        var name = workoutType == "New Workout"
+            ? AnsiConsole.Prompt(new TextPrompt<string>("Enter new workout name:"))
+            : workoutType;
+
+        var durationInput = AnsiConsole.Prompt(new TextPrompt<string>("Enter repetitions or time (min,sec):"));
+        if (!float.TryParse(durationInput, out float duration))
+        {
+            Console.WriteLine("Invalid input. Please enter a numeric value.");
+            return;
+        }
+
+        var workout = new Workoutdata(new WorkoutName(name), duration, currentUser, DateTime.Now);
+        dataManager.AddNewWorkoutData(workout);
+
+        Console.WriteLine($"Workout '{name}' logged successfully.");
+    }
+
+    // Full implementation of HandleWorkoutReports
+    private void HandleWorkoutReports(User currentUser)
+    {
+        AnsiConsole.Write(new FigletText("Workout Reports").Color(Color.Green));
+        var topLevelOption = PromptSelection("Choose report type", new[] { "Report Data", "Analyze Reports", "Group Data", "Exit" });
+
+        if (topLevelOption == "Exit") return;
+
+        if (topLevelOption == "Report Data")
+        {
+            AnsiConsole.Write(new Markup("You selected to [green]Report Data[/]\n"));
+            var reportType = PromptSelection("Choose detail level", new[] { "Report All Data", "Report Your Data Only", "Exit" });
+            if (reportType == "Exit") return;
+
+            var manager = new WorkoutManager(dataManager.WorkoutStoredData);
+            var workoutNames = manager.GetUniqueWorkoutNames();
+            var selected = PromptSelection("Select Workout Type", workoutNames);
+
+            var data = reportType == "Report All Data"
+                ? dataManager.GetWorkoutsByName(selected)
+                : dataManager.GetWorkoutsByName(selected).Where(w => w.User.Name == currentUser.Name).ToList();
+
+            var table = new Table();
+            table.AddColumn("[green]Workout[/]").Centered();
+            table.AddColumn("[green]Reps/Duration[/]").Centered();
+            table.AddColumn("[green]Timestamp[/]").Centered();
+
+            foreach (var w in data)
+                table.AddRow(w.WorkoutName.ToString(), w.WorkoutDuration.ToString(), w.TimeStamp.ToString());
+
+            AnsiConsole.Write(table);
+        }
+        else if (topLevelOption == "Analyze Reports")
+        {
+            AnsiConsole.Write(new Markup("You selected to [green]Analyze Reports[/]\n"));
+            var type = PromptSelection("Choose analysis scope", new[] { "Analyze All Data", "Analyze Your Data Only", "Exit" });
+            if (type == "Exit") return;
+
+            var manager = new WorkoutManager(dataManager.WorkoutStoredData);
+            var workoutNames = manager.GetUniqueWorkoutNames();
+            var selected = PromptSelection("Select Workout Type", workoutNames);
+
+            var data = dataManager.GetWorkoutsByName(selected);
+            if (type == "Analyze Your Data Only")
+                data = data.Where(w => w.User.Name == currentUser.Name).ToList();
+
+            var durations = data.Select(w => w.WorkoutDuration).OrderBy(d => d).ToList();
+            if (!durations.Any())
+            {
+                AnsiConsole.MarkupLine("[red]No data to analyze.[/]");
+                return;
+            }
+
+            var mean = durations.Average();
+            var median = durations.Count % 2 == 0
+                ? (durations[durations.Count / 2 - 1] + durations[durations.Count / 2]) / 2
+                : durations[durations.Count / 2];
+
+            var max = durations.Max();
+            var min = durations.Min();
+            var total = durations.Count;
+
+            var table = new Table();
+            table.AddColumn("[blue]Statistic[/]").Centered();
+            table.AddColumn("[blue]Value[/]").Centered();
+            table.AddRow("Mean", mean.ToString("0.##"));
+            table.AddRow("Median", median.ToString("0.##"));
+            table.AddRow("Max", max.ToString("0.##"));
+            table.AddRow("Min", min.ToString("0.##"));
+            table.AddRow("Total Entries", total.ToString());
+
+            AnsiConsole.Write(table);
+        }
+        else if (topLevelOption == "Group Data")
+        {
+            AnsiConsole.Write(new Markup("You selected [green]Group Data[/]\n"));
+            var userGroups = dataManager.GetUserGroups(currentUser);
+            if (!userGroups.Any())
+            {
+                AnsiConsole.MarkupLine("[red]You are not part of any group.[/]");
+                return;
+            }
+
+            var group = PromptSelection("Select your group", userGroups);
+            var groupUsers = dataManager.GetGroupUsers(group);
+            var groupWorkouts = dataManager.WorkoutStoredData.Where(w => groupUsers.Contains(w.User)).ToList();
+
+            var manager = new WorkoutManager(groupWorkouts);
+            var common = manager.GetPopularWorkouts();
+
+            if (!common.Any())
+            {
+                AnsiConsole.MarkupLine("[red]No group workouts with enough data.[/]");
+                return;
+            }
+
+            var action = PromptSelection("Choose an option", new[] { "Report Group Workouts", "Analyze Group Workouts", "Exit" });
+            if (action == "Exit") return;
+
+            var workout = PromptSelection("Select Workout", common);
+            var selectedWorkouts = groupWorkouts.Where(w => w.WorkoutName.Name == workout).ToList();
+
+            if (action == "Report Group Workouts")
+            {
+                var table = new Table();
+                table.AddColumn("User").Centered();
+                table.AddColumn("Workout").Centered();
+                table.AddColumn("Duration").Centered();
+                table.AddColumn("Timestamp").Centered();
+
+                foreach (var w in selectedWorkouts)
+                    table.AddRow(w.User.Name, w.WorkoutName.ToString(), w.WorkoutDuration.ToString("0.##"), w.TimeStamp.ToString("g"));
+
+                AnsiConsole.Write(table);
+            }
+            else if (action == "Analyze Group Workouts")
+            {
+                var durations = selectedWorkouts.Select(w => w.WorkoutDuration).OrderBy(d => d).ToList();
+                var mean = durations.Average();
+                var median = durations.Count % 2 == 0
+                    ? (durations[durations.Count / 2 - 1] + durations[durations.Count / 2]) / 2
+                    : durations[durations.Count / 2];
+
+                var lowest = selectedWorkouts.OrderBy(w => w.WorkoutDuration).First();
+                var highest = selectedWorkouts.OrderByDescending(w => w.WorkoutDuration).First();
+
+                var extremes = new Table();
+                extremes.AddColumn("Type").Centered();
+                extremes.AddColumn("User").Centered();
+                extremes.AddColumn("Value").Centered();
+                extremes.AddColumn("Date").Centered();
+                extremes.AddRow("Lowest", lowest.User.Name, lowest.WorkoutDuration.ToString("0.##"), lowest.TimeStamp.ToString("g"));
+                extremes.AddRow("Highest", highest.User.Name, highest.WorkoutDuration.ToString("0.##"), highest.TimeStamp.ToString("g"));
+
+                var stats = new Table();
+                stats.AddColumn("Statistic").Centered();
+                stats.AddColumn("Value").Centered();
+                stats.AddRow("Mean", mean.ToString("0.##"));
+                stats.AddRow("Median", median.ToString("0.##"));
+
+                AnsiConsole.Write(extremes);
+                AnsiConsole.Write(stats);
+            }
+        }
+    }
+
+    private void HandleGroupManagement(User currentUser)
+    {
+        AnsiConsole.Write(new FigletText("Join a Group").Color(Color.Blue3));
+        var groupNames = dataManager.Groups.Select(g => g.Name).Distinct().ToList();
+        var selection = PromptSelection("Select a group or create new", groupNames.Concat(new[] { "New Group" }));
+
+        if (selection == "New Group")
+        {
+            var newName = AnsiConsole.Prompt(new TextPrompt<string>("Enter name for new group:"));
+            if (groupNames.Contains(newName))
+            {
+                if (PromptSelection("Group exists. Join?", new[] { "Yes", "No" }) == "Yes")
+                {
+                    dataManager.AddUserToGroup(newName, currentUser.Name);
+                }
+            }
+            else
+            {
+                dataManager.CreateGroup(newName, currentUser.Name);
+            }
+        }
+        else
+        {
+            dataManager.AddUserToGroup(selection, currentUser.Name);
+        }
+    }
+
+    private string PromptSelection(string title, IEnumerable<string> choices)
+    {
+        return AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title(title)
+                .AddChoices(choices)
+        );
+    }
 }
-    
