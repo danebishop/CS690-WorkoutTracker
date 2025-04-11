@@ -125,7 +125,6 @@ public class ConsoleUI
         Console.WriteLine($"Workout '{name}' logged successfully.");
     }
 
-    // Full implementation of HandleWorkoutReports
     private void HandleWorkoutReports(User currentUser)
     {
         AnsiConsole.Write(new FigletText("Workout Reports").Color(Color.Green));
