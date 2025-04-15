@@ -1,10 +1,20 @@
 # CS690-WorkoutTracker
 
-Final project to create an app to track workouts. 
+**WorkoutTracker is a simple, easy to use app to track your workouts**
 
+WorkoutTracker is console application developed to allow users to log, track, report and analyze their workouts. In addition, users can also join groups with other users to allow group tracking and reporting of workouts. 
 
+**Main Features of WorkoutTracker:**
 
-Below are some shortcut commands I stored here for quick use
+✅ Log personal workouts
 
-Test Coverage Assessment tool 
-dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:Threshold=80
+✅ Report personal workouts
+
+✅ Analyze a specific workout for a single user
+
+✅ Analyze a specific workout for all users
+
+✅ Report workout data for a specific workout for user group
+
+✅ Analyze workout data for a specific workout for user group
+
