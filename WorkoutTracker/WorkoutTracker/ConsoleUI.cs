@@ -129,18 +129,20 @@ public class ConsoleUI
     {
         AnsiConsole.Write(new FigletText("Workout Reports").Color(Color.Green));
         var topLevelOption = PromptSelection("Choose report type", new[] { "Report Data", "Analyze Reports", "Group Data", "Exit" });
+        AnsiConsole.Write(new Markup($"You selected [green]{topLevelOption}[/]\n"));
 
         if (topLevelOption == "Exit") return;
 
         if (topLevelOption == "Report Data")
         {
-            AnsiConsole.Write(new Markup("You selected to [green]Report Data[/]\n"));
             var reportType = PromptSelection("Choose detail level", new[] { "Report All Data", "Report Your Data Only", "Exit" });
+            AnsiConsole.Write(new Markup($"You selected [green]{reportType}[/]\n"));
             if (reportType == "Exit") return;
 
             var manager = new WorkoutManager(dataManager.WorkoutStoredData);
             var workoutNames = manager.GetUniqueWorkoutNames();
             var selected = PromptSelection("Select Workout Type", workoutNames);
+            AnsiConsole.Write(new Markup($"You selected [green]{selected}[/] workout\n"));
 
             var data = reportType == "Report All Data"
                 ? dataManager.GetWorkoutsByName(selected)
@@ -158,13 +160,14 @@ public class ConsoleUI
         }
         else if (topLevelOption == "Analyze Reports")
         {
-            AnsiConsole.Write(new Markup("You selected to [green]Analyze Reports[/]\n"));
-            var type = PromptSelection("Choose analysis scope", new[] { "Analyze All Data", "Analyze Your Data Only", "Exit" });
+            var type = PromptSelection("Choose analysis type", new[] { "Analyze All Data", "Analyze Your Data Only", "Exit" });
+            AnsiConsole.Write(new Markup($"You selected [green]{type}[/]\n"));
             if (type == "Exit") return;
 
             var manager = new WorkoutManager(dataManager.WorkoutStoredData);
             var workoutNames = manager.GetUniqueWorkoutNames();
             var selected = PromptSelection("Select Workout Type", workoutNames);
+            AnsiConsole.Write(new Markup($"You selected [green]{selected}[/] workout\n"));
 
             var data = dataManager.GetWorkoutsByName(selected);
             if (type == "Analyze Your Data Only")
@@ -199,7 +202,6 @@ public class ConsoleUI
         }
         else if (topLevelOption == "Group Data")
         {
-            AnsiConsole.Write(new Markup("You selected [green]Group Data[/]\n"));
             var userGroups = dataManager.GetUserGroups(currentUser);
             if (!userGroups.Any())
             {
@@ -222,12 +224,15 @@ public class ConsoleUI
 
             var action = PromptSelection("Choose an option", new[] { "Report Group Workouts", "Analyze Group Workouts", "Exit" });
             if (action == "Exit") return;
+            AnsiConsole.Write(new Markup($"You selected [green]{action}[/]\n"));
 
             var workout = PromptSelection("Select Workout", common);
+            AnsiConsole.Write(new Markup($"You selected [green]{workout}[/]\n"));
             var selectedWorkouts = groupWorkouts.Where(w => w.WorkoutName.Name == workout).ToList();
 
             if (action == "Report Group Workouts")
             {
+                
                 var table = new Table();
                 table.AddColumn("User").Centered();
                 table.AddColumn("Workout").Centered();
@@ -236,7 +241,7 @@ public class ConsoleUI
 
                 foreach (var w in selectedWorkouts)
                     table.AddRow(w.User.Name, w.WorkoutName.ToString(), w.WorkoutDuration.ToString("0.##"), w.TimeStamp.ToString("g"));
-
+                
                 AnsiConsole.Write(table);
             }
             else if (action == "Analyze Group Workouts")
